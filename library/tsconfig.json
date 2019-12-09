@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"strict": true,
+
+		"outDir": "build",
+		"declaration": true,
+
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"importHelpers": true
+	},
+	"include": [ "src/**/*.ts" ]
+}

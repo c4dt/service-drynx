@@ -1,0 +1,40 @@
+{
+	"name": "@c4dt/drynx",
+	"version": "0.0.0",
+	"description": "TypeScript interface to Drynx",
+	"main": "build/index.js",
+	"browser": {
+		"ws": false
+	},
+	"scripts": {
+		"build": "tsc",
+		"test": "ts-node node_modules/.bin/jasmine"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/c4dt/service-drynx.git"
+	},
+	"author": "C4DT",
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/c4dt/service-drynx/issues"
+	},
+	"homepage": "https://github.com/c4dt/service-drynx/tree/master/library#readme",
+	"dependencies": {
+		"@dedis/cothority": "^3.4.2",
+		"immutable": "^4.0.0-rc.12",
+		"protobufjs": "^6.8.8",
+		"tslib": "^1.10.0"
+	},
+	"devDependencies": {
+		"@types/concat-stream": "^1.6.0",
+		"@types/jasmine": "^3.5.0",
+		"@types/node": "^12.12.17",
+		"@types/ws": "^6.0.4",
+		"concat-stream": "^2.0.0",
+		"jasmine": "^3.5.0",
+		"jasmine-ts-console-reporter": "^3.1.1",
+		"ts-node": "^8.5.2",
+		"typescript": "^3.7.3"
+	}
+}
