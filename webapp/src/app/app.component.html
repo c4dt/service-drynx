@@ -1,4 +1,7 @@
-<mat-grid-list cols="1" rowHeight="100%">
+<mat-grid-list cols="2" rowHeight="50%">
+	<mat-grid-tile *ngFor="let dataset of datasets">
+		<app-dataprovider-viewer [table]="dataset | async"></app-dataprovider-viewer>
+	</mat-grid-tile>
 	<mat-grid-tile>
 		<app-query-runner></app-query-runner>
 	</mat-grid-tile>
