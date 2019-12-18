@@ -3,7 +3,7 @@ import { Message } from "protobufjs/light";
 import * as Cothority from "@dedis/cothority";
 import { registerMessage } from "@dedis/cothority/protobuf"; // dedis/cothority#2154
 
-type ColumnID = string;
+export type ColumnID = string;
 
 class PublishSignatureBytes extends Message<PublishSignatureBytes> {
 	static register() {
