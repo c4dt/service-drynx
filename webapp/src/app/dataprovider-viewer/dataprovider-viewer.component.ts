@@ -1,4 +1,4 @@
-import { Map, List } from "immutable";
+import { List } from "immutable";
 
 import { Component, Input } from '@angular/core';
 
@@ -31,5 +31,5 @@ export class Table<T> {
 	templateUrl: './dataprovider-viewer.component.html',
 })
 export class DataproviderViewerComponent {
-	@Input() public table: Table<string> | undefined;
+	@Input() public table: Table<string> | null | undefined;
 }

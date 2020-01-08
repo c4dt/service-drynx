@@ -1,14 +1,16 @@
 <ng-container *ngIf="table === undefined">undefined</ng-container>
-<ng-container *ngIf="table === null; else showTable">null</ng-container>
+<ng-container *ngIf="table === null; else showTable">loading dataset...</ng-container>
 <ng-template #showTable>
-	<mat-table [dataSource]="table.toObject()">
-		<mat-header-row *matHeaderRowDef="table.header.toJS()"></mat-header-row>
-		<mat-row *matRowDef="let row; columns: table.header.toJS()"></mat-row>
+	<cdk-virtual-scroll-viewport style="height: 100%" itemSize="1">
+		<mat-table [dataSource]="table.toObject()">
+			<mat-header-row *matHeaderRowDef="table.header.toJS(); sticky: true"></mat-header-row>
+			<mat-row *matRowDef="let row; columns: table.header.toJS()"></mat-row>
 
-		<ng-container *ngFor="let col of table.header.toJS()" matColumnDef="{{col}}">
-			<mat-header-cell *matHeaderCellDef> {{col}} </mat-header-cell>
-			<mat-cell *matCellDef="let row"> {{row[col]}} </mat-cell>
-		</ng-container>
+			<ng-container *ngFor="let col of table.header.toJS()" matColumnDef="{{col}}">
+				<mat-header-cell *matHeaderCellDef> {{col}} </mat-header-cell>
+				<mat-cell *matCellDef="let row"> {{row[col]}} </mat-cell>
+			</ng-container>
 
-	</mat-table>
+		</mat-table>
+	</cdk-virtual-scroll-viewport>
 </ng-template>
