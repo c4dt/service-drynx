@@ -3,32 +3,36 @@ import { Injectable } from '@angular/core';
 import * as cothority from "@dedis/cothority";
 import * as kyber from "@dedis/kyber";
 
+const datasetBaseURL = "http://10.90.47.29:17253";
+
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root'
 })
 export class ConfigService {
-	public readonly ClientURL = new URL(`ws://${location.hostname}:1235`);
+	public readonly ClientURL = new URL("ws://10.90.47.29:21047");
 
-	public readonly ComputingNode = new cothority.network.ServerIdentity({
-		public: Buffer.concat([
-			kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-			Buffer.from("3b44ee5d76acde1206fa1dab49fa168cd3fa2beb6b8da2a8c26b278dcd94b9b276585b6c050557d31f6776a31f88124778c47fe157d126e2de149b7eef122b01", "hex")]),
-		address: `tcp://${location.hostname}:1234`,
-	});
 	public readonly DataProviders = [{
-			datasetURL: new URL("dataset/1236", location.href),
+			datasetURL: new URL(`${datasetBaseURL}/1`),
 			identity: new cothority.network.ServerIdentity({
-				address: `tcp://${location.hostname}:1236`,
+				address: "tcp://10.233.110.26:1234",
 				public: Buffer.concat([
 					kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-					Buffer.from("8baeec0eb207908255fb0685050dec08e0cb45bb0174d49a541971edd19d03fa14742f7614651019579b06f334c13f1e9158d67ca0e00db6fe7e831642917f3c", "hex")]),
+					Buffer.from("10a0b188fe473478fe9ba75cc2a3cc9d16cd2fffe5afd50aa446c4a4b6a947021220ab4553c89c3d1719f5281b4b8b617dcb7d10f8392ea552dd5fc45305d76f", "hex")]),
 		})}, {
-			datasetURL: new URL("dataset/1238", location.href),
+			datasetURL: new URL(`${datasetBaseURL}/2`),
 			identity: new cothority.network.ServerIdentity({
-				address: `tcp://${location.hostname}:1238`,
+				address: "tcp://10.233.80.108:1234",
 				public: Buffer.concat([
 					kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-					Buffer.from("4900e8a533a8266439096b06d84defe7eea7183177ce0b454523b1c71a3531d9680a4baf087aff52587eb23e26196bdfb7e60146ac7ad906b43c0949fa82d9c1", "hex")]),
+					Buffer.from("31aa1f16b7094e491be5459464300b99c50899e72c21478a93b41bf980763ea12f6fb8ab9affd7f2519b00f8581d7d1dabe666e0c1c705ced777558b18b53e3c", "hex")]),
+		})}, {
+			datasetURL: new URL(`${datasetBaseURL}/3`),
+			identity: new cothority.network.ServerIdentity({
+				address: "tcp://10.233.123.194:1234",
+				public: Buffer.concat([
+					kyber.pairing.point.BN256G1Point.MARSHAL_ID,
+					Buffer.from("79b364b4991dd3721edb94f4c5b1d54ad1fd95086370c48c3849115d46399ff28ccdcd9a78e9f4a084069d4762c89ae71037c4b23af0e880280565a11c6693a4", "hex")]),
 		})},
 	]
+	public readonly ComputingNode = this.DataProviders[0].identity;
 }
