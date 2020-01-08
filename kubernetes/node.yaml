@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drynx-node-$ID
+  labels:
+    app: drynx-node-$ID
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drynx-node-$ID
+  template:
+    metadata:
+      labels:
+        app: drynx-node-$ID
+    spec:
+      initContainers:
+      - name: gen-config
+        image: c4dt/drynx:latest
+        command: ["/bin/sh", "-c", "/server new $POD_IP:1234 $POD_IP:1235 | /server data-provider new file-loader /dataset/$ID | /server computing-node new | /server verifying-node new > /config/config"]
+        volumeMounts:
+          - name: config
+            mountPath: /config
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+
+      containers:
+      - name: node
+        image: c4dt/drynx:latest
+        ports:
+        - containerPort: 1234
+          name: node
+        - containerPort: 1235
+          name: client
+        command: ["/bin/sh", "-c", "/server run < /config/config"]
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: to-provide
+            mountPath: /dataset
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: to-provide
+          configMap:
+            name: datasets

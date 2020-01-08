@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drynx
+spec:
+  selector:
+    app: drynx-node-$ID
+  ports:
+    - port: 1235
+  type: LoadBalancer

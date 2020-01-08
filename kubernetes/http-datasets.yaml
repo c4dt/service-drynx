@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drynx-http-datasets
+  labels:
+    app: drynx-http-datasets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drynx-http-datasets
+  template:
+    metadata:
+      labels:
+        app: drynx-http-datasets
+    spec:
+      containers:
+      - name: http-dataset
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        command: ["/bin/sh", "-xc", "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'"]
+        volumeMounts:
+          - name: datasets
+            mountPath: /usr/share/nginx/html
+      volumes:
+        - name: datasets
+          configMap:
+            name: datasets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drynx-datasets
+spec:
+  selector:
+    app: drynx-http-datasets
+  ports:
+    - port: 80
+  type: LoadBalancer
