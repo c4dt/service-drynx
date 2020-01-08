@@ -3,6 +3,6 @@
 		<app-dataprovider-viewer [table]="dataset | async"></app-dataprovider-viewer>
 	</mat-grid-tile>
 	<mat-grid-tile>
-		<app-query-runner></app-query-runner>
+		<app-query-runner [columns]="columns | async"></app-query-runner>
 	</mat-grid-tile>
 </mat-grid-list>

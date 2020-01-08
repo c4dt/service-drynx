@@ -3,6 +3,8 @@ import { List } from "immutable";
 import { Component } from '@angular/core';
 import * as csv from "papaparse";
 
+import { ColumnID } from "@c4dt/drynx";
+
 import { ConfigService } from "./config.service";
 import { Table } from "./dataprovider-viewer/dataprovider-viewer.component";
 
@@ -13,11 +15,13 @@ import { Table } from "./dataprovider-viewer/dataprovider-viewer.component";
 })
 export class AppComponent {
 	public datasets: List<Promise<Table<string>>>;
+	public columns: Promise<List<ColumnID>>;
 
 	constructor(
 		private readonly config: ConfigService,
 	) {
 		this.datasets = List(this.config.DataProviders.map(dp => AppComponent.fetchDataset(dp.datasetURL)))
+		this.columns = Promise.all(this.datasets).then((ret) => AppComponent.getCommonColumns(List(ret)))
 	}
 
 	private static async fetchDataset(url: URL): Promise<Table<string>> {
@@ -37,5 +41,13 @@ export class AppComponent {
 		const header: List<string> = List(rows.shift());
 
 		return new Table(header, List(rows.map(l => List(l))));
+	}
+
+	private static getCommonColumns(datasets: List<Table<string>>): List<ColumnID> {
+		// TODO actually merge commons
+		const found = datasets.get(0);
+		if (found === undefined)
+			return List();
+		return found.header;
 	}
 }

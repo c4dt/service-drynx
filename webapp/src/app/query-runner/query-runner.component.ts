@@ -1,9 +1,9 @@
-import { Map } from "immutable";
+import { List, Map } from "immutable";
 
-import { Component } from '@angular/core';
+import { Input, Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { SurveyQuery, Operation, Query, ServerIdentityList } from '@c4dt/drynx';
+import { ColumnID, SurveyQuery, Operation, Query, ServerIdentityList } from '@c4dt/drynx';
 import * as cothority from '@dedis/cothority';
 
 import { ClientService } from "../client.service";
@@ -14,10 +14,13 @@ import { ConfigService } from '../config.service';
 	templateUrl: './query-runner.component.html',
 })
 export class QueryRunnerComponent {
+	@Input() public columns: List<ColumnID> | null | undefined;
+
 	public readonly operations = ["sum", "mean", "variance"];
 
 	public readonly queryBuilder = new FormGroup({
 		operation: new FormControl(this.operations[0], Validators.required),
+		column: new FormControl(undefined, Validators.required),
 	})
 
 	public launchQuery: SurveyQuery | undefined;
@@ -33,31 +36,32 @@ export class QueryRunnerComponent {
 		if (operation === null)
 			return undefined
 
-		const nodes: cothority.network.ServerIdentity[] = [
-			this.config.ComputingNode,
-			...this.config.DataProviders.map(d => d.identity),
-		]
+		const column = this.queryBuilder.get("column");
+		if (column === null)
+			return undefined
 
-		nodes.forEach(si => console.log(si.getPublic().toString()))
-		
+		const ids = this.config.DataProviders.map(d => d.identity);
+		const actualDPs = ids.slice(1); // TODO
+
 		let idtopublic: Map<string, Buffer> = Map();
-		for (const n of nodes) {
+		for (const n of ids) {
 			idtopublic = idtopublic.set(n.address, n.public)
 		}
 
 		return new SurveyQuery({
 			surveyid: "test-query",
 			query: new Query({
-					selector: ["col1"],
+					selector: [column.value],
 					operation: new Operation({
 						nameop: operation.value,
+						nbrinput: 1,
 					}),
 				}),
 
-			rosterservers: new cothority.network.Roster({list: nodes}),
+			rosterservers: new cothority.network.Roster({list: ids}),
 			servertodp: {
 				[this.config.ComputingNode.address]:
-					new ServerIdentityList({content: this.config.DataProviders.map(d => d.identity)})},
+					new ServerIdentityList({content: actualDPs})},
 			idtopublic: idtopublic.toJSON(),
 		})
 	}
