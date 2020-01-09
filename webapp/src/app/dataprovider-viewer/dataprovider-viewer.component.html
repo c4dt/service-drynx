@@ -8,7 +8,12 @@
 
 			<ng-container *ngFor="let col of table.header.toJS()" matColumnDef="{{col}}">
 				<mat-header-cell *matHeaderCellDef> {{col}} </mat-header-cell>
-				<mat-cell *matCellDef="let row"> {{row[col]}} </mat-cell>
+				<mat-cell *matCellDef="let row">
+					<ng-container *ngIf="row[col][0] === ColumnType.Date; else defaultPipe">
+						{{row[col][1] | date}}
+					</ng-container>
+					<ng-template #defaultPipe>{{row[col][1]}}</ng-template>
+				</mat-cell>
 			</ng-container>
 
 		</mat-table>

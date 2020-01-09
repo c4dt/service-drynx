@@ -13,6 +13,7 @@ kubernetes-deploy:
 	kubectl create configmap datasets --from-file=kubernetes/datasets
 	for f in kubernetes/datasets/*; do \
 		! [ -e $f ] && echo provide datasets in kubernetes/datasets && exit 1; \
+		[ "$${f##*_}" = types ] && continue; \
 		sed s,\$$ID,`basename $$f`, kubernetes/node.yaml | kubectl apply -f - ; \
 	done
 	sed s,\$$ID,`ls kubernetes/datasets | sort | head -n1`, kubernetes/drynx.yaml | kubectl apply -f -

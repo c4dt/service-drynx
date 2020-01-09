@@ -13,6 +13,7 @@ export class ConfigService {
 
 	public readonly DataProviders = [{
 			datasetURL: new URL(`${datasetBaseURL}/1`),
+			datasetTypesURL: new URL(`${datasetBaseURL}/1_types`),
 			identity: new cothority.network.ServerIdentity({
 				address: "tcp://10.233.110.26:1234",
 				public: Buffer.concat([
@@ -20,6 +21,7 @@ export class ConfigService {
 					Buffer.from("10a0b188fe473478fe9ba75cc2a3cc9d16cd2fffe5afd50aa446c4a4b6a947021220ab4553c89c3d1719f5281b4b8b617dcb7d10f8392ea552dd5fc45305d76f", "hex")]),
 		})}, {
 			datasetURL: new URL(`${datasetBaseURL}/2`),
+			datasetTypesURL: new URL(`${datasetBaseURL}/2_types`),
 			identity: new cothority.network.ServerIdentity({
 				address: "tcp://10.233.80.108:1234",
 				public: Buffer.concat([
@@ -27,6 +29,7 @@ export class ConfigService {
 					Buffer.from("31aa1f16b7094e491be5459464300b99c50899e72c21478a93b41bf980763ea12f6fb8ab9affd7f2519b00f8581d7d1dabe666e0c1c705ced777558b18b53e3c", "hex")]),
 		})}, {
 			datasetURL: new URL(`${datasetBaseURL}/3`),
+			datasetTypesURL: new URL(`${datasetBaseURL}/3_types`),
 			identity: new cothority.network.ServerIdentity({
 				address: "tcp://10.233.123.194:1234",
 				public: Buffer.concat([

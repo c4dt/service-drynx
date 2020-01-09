@@ -6,24 +6,24 @@ import * as csv from "papaparse";
 import { ColumnID } from "@c4dt/drynx";
 
 import { ConfigService } from "./config.service";
-import { Table } from "./dataprovider-viewer/dataprovider-viewer.component";
+import { ColumnType, Table } from "./dataprovider-viewer/dataprovider-viewer.component";
 
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 })
 export class AppComponent {
-	public datasets: List<Promise<Table<string>>>;
+	public datasets: List<Promise<Table>>;
 	public columns: Promise<List<ColumnID>>;
 
 	constructor(
 		private readonly config: ConfigService,
 	) {
-		this.datasets = List(this.config.DataProviders.map(dp => AppComponent.fetchDataset(dp.datasetURL)))
-		this.columns = Promise.all(this.datasets).then((ret) => AppComponent.getCommonColumns(List(ret)))
+		this.datasets = List(this.config.DataProviders.map(dp => AppComponent.fetchDataset(dp.datasetURL, dp.datasetTypesURL)))
+		this.columns = Promise.all(this.datasets).then(ret => AppComponent.getUsableColumns(List(ret)))
 	}
 
-	private static async fetchDataset(url: URL): Promise<Table<string>> {
+	private static async getAndParseCSV(url: URL): Promise<List<List<string>>> {
 		const results = await new Promise<csv.ParseResult>((resolve, reject) => csv.parse(url.href, {
 			download: true,
 			delimiter: "\t",
@@ -33,20 +33,38 @@ export class AppComponent {
 		}));
 		for (const err of results.errors)
 			throw new Error(`when CSV parsing: ${err.message}`);
-		const rows = results.data;
-
-		if (rows.length == 0)
-			throw new Error("dataset doesn't have any row")
-		const header: List<string> = List(rows.shift());
-
-		return new Table(header, List(rows.map(l => List(l))));
+		return List(results.data.map((row: string[]) => List(row)));
 	}
 
-	private static getCommonColumns(datasets: List<Table<string>>): List<ColumnID> {
-		// TODO actually merge commons
+	private static async fetchDataset(datasetURL: URL, datasetTypesURL: URL): Promise<Table> {
+		const typesCSV = this.getAndParseCSV(datasetTypesURL);
+		const datasetCSV = this.getAndParseCSV(datasetURL);
+
+		const typesStr = (await typesCSV).get(0);
+		if ((await typesCSV).size !== 1 || typesStr === undefined)
+			throw new Error("dataset's types should contain a single line")
+		const types = typesStr.map(t => { switch(t) {
+			case "number": return ColumnType.Number;
+			case "date": return ColumnType.Date;
+			case "string": return ColumnType.String;
+			default: throw new Error(`unknown dataset's type: ${t}`);
+		}});
+
+		const header = (await datasetCSV).get(0);
+		if (header === undefined)
+			throw new Error("dataset doesn't have any row")
+
+		return new Table(types, header, (await datasetCSV).shift());
+	}
+
+	private static getUsableColumns(datasets: List<Table>): List<ColumnID> {
+		// TODO merge commons columns
 		const found = datasets.get(0);
 		if (found === undefined)
 			return List();
-		return found.header;
+
+		return found.header.zip(found.types)
+			.filter(([_, t]) => t === ColumnType.Number || t === ColumnType.Date)
+			.map(([id, _]) => id);
 	}
 }
