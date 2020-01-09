@@ -11,7 +11,6 @@ import { Table } from "./dataprovider-viewer/dataprovider-viewer.component";
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
-	styles: ['app-dataprovider-viewer { box-shadow: 0 0 10px grey; height: calc(100% - 20px); width: calc(100% - 20px) }'],
 })
 export class AppComponent {
 	public datasets: List<Promise<Table<string>>>;
