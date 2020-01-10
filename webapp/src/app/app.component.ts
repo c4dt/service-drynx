@@ -58,13 +58,27 @@ export class AppComponent {
 	}
 
 	private static getUsableColumns(datasets: List<Table>): List<ColumnID> {
-		// TODO merge commons columns
-		const found = datasets.get(0);
-		if (found === undefined)
+		const first = datasets.get(0);
+		if (first === undefined)
 			return List();
+		const firstColumns: List<[ColumnType, ColumnID] | undefined> = first.types.zip(first.header);
 
-		return found.header.zip(found.types)
-			.filter(([_, t]) => t === ColumnType.Number || t === ColumnType.Date)
-			.map(([id, _]) => id);
+		const merged = datasets.shift().reduce((acc, dataset) => {
+			return acc.zipAll(dataset.types.zip(dataset.header))
+				.map(([left, right]) => {
+					if (left === undefined || left[0] !== right[0] || left[1] !== right[1])
+						return undefined;
+					return left;
+				})
+		}, firstColumns);
+
+		// @ts-ignore
+		// TODO filter for undefined doesn't reduce type
+		const filtered: List<[ColumnType, ColumnID]> = merged
+			.filter(column => column !== undefined);
+
+		return filtered
+			.filter(([t, _]) => t === ColumnType.Number || t === ColumnType.Date)
+			.map(([_, id]) => id);
 	}
 }
