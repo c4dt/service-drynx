@@ -6,6 +6,7 @@ import {PointFactory, Point, Scalar} from "@dedis/kyber";
 
 import { Suite } from "./suite";
 import { CipherText } from "./conv";
+import {Map} from 'immutable';
 
 /**
  * Holds a keypair of a scalar/point pair, where the point is the scalar * Base,
@@ -14,16 +15,14 @@ import { CipherText } from "./conv";
 export class KeyPair {
 	point: Point;
 
-	constructor(public scalar: Scalar) {
+	constructor(public readonly scalar: Scalar) {
 		this.point = new BN256G1Point();
 		const base = new BN256G1Point().base();
 		this.point.mul(scalar, base);
 	}
 
 	static random(): KeyPair {
-		// TODO: find out why this fails to pass the "Should create keypair" test if it is 32!?!
-		const s = new BN256Scalar(randomBytes(31));
-		return new KeyPair(s);
+		return new KeyPair(new BN256Scalar().pick());
 	}
 }
 
@@ -39,16 +38,25 @@ interface Encrypted {
 /**
  * Basic LibDrynx methods that can be used to encrypt and decrypt values.
  */
-export class LibDrynx {
-	static maxInt = 100;
+export class Crypto {
+	static readonly maxInt = 10000;
+
+	private computed: Map<Point, number>;
+
+	constructor() {
+		this.computed = Map();
+	}
 
 	/**
 	 * Encrypts an integer so that it can be used in homomorphic operations.
 	 * @param pub
 	 * @param i
 	 */
-	static encryptInt(pub: Point, i: number): CipherText {
-		const enc = this.encryptPoint(pub, this.intToPoint(i));
+	encryptInt(pub: Point, i: number): CipherText {
+		const point = Crypto.intToPoint(i);
+		this.computed = this.computed.set(point, i);
+
+		const enc = Crypto.encryptPoint(pub, point);
 		return enc.CT;
 	}
 
@@ -59,9 +67,16 @@ export class LibDrynx {
 	 * @param cipher
 	 * @param checkNeg
 	 */
-	static decryptInt(priv: Scalar, cipher: CipherText, checkNeg: boolean = false): number {
-		const M = this.decryptPoint(priv, cipher);
-		return this.pointtoInt(M, checkNeg);
+	decryptInt(priv: Scalar, cipher: CipherText, checkNeg: boolean = false): number {
+		const point = Crypto.decryptPoint(priv, cipher);
+		const found = this.computed.get(point)
+		if (found !== undefined)
+			return found;
+
+		const ret = Crypto.pointtoInt(point, checkNeg);
+		this.computed = this.computed.set(point, ret);
+
+		return ret;
 	}
 
 	/**
@@ -118,40 +133,30 @@ export class LibDrynx {
 	 * ascending value.
 	 * If checkNeg is true, it tries to find the number in a zig-zag way: 0, 1, -1, 2, -2, ...
 	 * TODO: add a static table to speed up lookups of known numbers.
-	 * TODO: to make it faster, one could directly work with points:
-	 * p1 = 1 * base
-	 * p2 = 2 * base = p1 + base
-	 * -> so instead of doing the mul for every step, which is very expensive, one could
-	 * simply add the base at every step.
-	 * I tried it out and found some strange things happening that should not be happening.
-	 * So for the time being this is a future optimization...
 	 * @param p
 	 * @param checkNeg
 	 */
-	static pointtoInt(p: Point, checkNeg: boolean): number {
-		const b = Suite.point().base();
-		if (p.equals(Suite.point().mul(Suite.scalar().zero(), b))) {
-			return 0;
-		}
+	static pointtoInt(toReverse: Point, checkNeg: boolean): number {
+		const base = Suite.point().base();
+		const zero = Suite.scalar().zero();
 		const one = Suite.scalar().one();
-		const s = Suite.scalar().one();
-		let i = 1;
-		while (true) {
-			if (p.equals(Suite.point().mul(s, b))) {
+
+		const one_point = Suite.point().mul(one, base);
+
+		let guess = Suite.point().mul(zero, base);
+		for (let i = 0; i <= this.maxInt; i++, guess.add(guess, one_point)) {
+			if (toReverse.equals(guess))
 				return i;
-			}
+
 			if (checkNeg) {
-				i = i * -1;
-				s.neg(s);
-				if (i < 0) {
-					continue;
-				}
-			}
-			i = i + 1;
-			s.add(s, one);
-			if (i > this.maxInt){
-				throw new Error("didn't find discreet log");
+				// TODO double negation
+				guess.neg(guess)
+				if (toReverse.equals(guess))
+					return -i;
+				guess.neg(guess);
 			}
 		}
+
+		throw new Error("didn't find discrete log");
 	}
 }
