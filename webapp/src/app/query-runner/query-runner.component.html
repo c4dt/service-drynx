@@ -1,6 +1,6 @@
 <mat-list>
 
-<form [formGroup]="queryBuilder" (ngSubmit)="runQuery(buildQuery())">
+<form [formGroup]="queryBuilder" (ngSubmit)="runQuery(throwOnUndefined(buildQuery()))">
 	<mat-list-item><mat-form-field>
 		<mat-label>operation</mat-label>
 		<mat-select formControlName="operation">

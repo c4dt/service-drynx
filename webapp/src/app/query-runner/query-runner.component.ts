@@ -66,6 +66,12 @@ export class QueryRunnerComponent {
 		})
 	}
 
+	throwOnUndefined<T>(val: T | undefined): T {
+		if (val === undefined)
+			throw new Error("undefined found")
+		return val;
+	}
+
 	async runQuery(query: SurveyQuery) {
 		this.results = await this.client.run(query);
 	}
