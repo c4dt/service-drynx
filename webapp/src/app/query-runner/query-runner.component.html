@@ -30,7 +30,7 @@
 			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 		</ng-container>
 		<ng-container *ngIf="results !== undefined && results !== 'loading'">
-			Results: {{results}}
+			Results: {{results.toJS()}}
 		</ng-container>
 	</mat-list-item>
 </mat-list>

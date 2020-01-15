@@ -24,7 +24,7 @@ export class QueryRunnerComponent {
   })
 
   public launchQuery: SurveyQuery | undefined
-  public results: number[] | undefined
+  public results: List<number> | 'loading' | undefined
 
   constructor (
     private readonly client: ClientService,
@@ -77,6 +77,7 @@ export class QueryRunnerComponent {
   }
 
   async runQuery (query: SurveyQuery): Promise<void> {
+    this.results = 'loading'
     this.results = await this.client.run(query)
   }
 }

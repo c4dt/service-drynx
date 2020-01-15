@@ -4,6 +4,7 @@ import { addJSON } from '@dedis/cothority/protobuf' // dedis/cothority#2154
 import { SurveyQuery, ResponseDP } from './conv'
 import { KeyPair, Crypto } from './crypto'
 import proto from './proto.json'
+import { List } from 'immutable'
 
 export class Client {
   private readonly connection: Cothority.network.connection.WebSocketConnection;
@@ -26,7 +27,7 @@ export class Client {
     this.keys = keys
   }
 
-  async run (sq: SurveyQuery): Promise<number[]> {
+  async run (sq: SurveyQuery): Promise<List<number>> {
     sq.clientpubkey = this.keys.point.marshalBinary()
 
     const ret = await this.connection.send<ResponseDP>(sq, ResponseDP)
@@ -50,5 +51,6 @@ export class Client {
 
       return this.crypto.decryptInt(text)
     })
+    return List(results)
   }
 }
