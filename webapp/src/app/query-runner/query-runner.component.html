@@ -1,31 +1,36 @@
-<mat-list>
-
 <form [formGroup]="queryBuilder" (ngSubmit)="runQuery(throwOnUndefined(buildQuery()))">
-	<mat-list-item><mat-form-field>
-		<mat-label>operation</mat-label>
-		<mat-select formControlName="operation">
-			<mat-option *ngFor="let op of operations" value="{{op}}">
-				{{op}}
-			</mat-option>
-		</mat-select>
-	</mat-form-field></mat-list-item>
+	<mat-list>
+		<mat-list-item><mat-form-field>
+			<mat-label>operation</mat-label>
+			<mat-select formControlName="operation">
+				<mat-option *ngFor="let op of operations" value="{{op}}">
+					{{op}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field></mat-list-item>
 
-	<mat-list-item><mat-form-field>
-		<mat-label>column</mat-label>
-		<mat-select formControlName="column">
-			<mat-option *ngFor="let col of columns" value="{{col}}">
-				{{col}}
-			</mat-option>
-		</mat-select>
-	</mat-form-field></mat-list-item>
+		<mat-list-item><mat-form-field>
+			<mat-label>column</mat-label>
+			<mat-select formControlName="column">
+				<mat-option *ngFor="let col of columns" value="{{col}}">
+					{{col}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field></mat-list-item>
 
-	<mat-list-item><button mat-button type="submit" [disabled]="!queryBuilder.valid">
-		launch
-	</button></mat-list-item>
+		<mat-list-item><button mat-button type="submit" [disabled]="!queryBuilder.valid">
+			launch
+		</button></mat-list-item>
+	</mat-list>
 </form>
 
-<mat-list-item>
-	Results: {{results}}
-</mat-list-item>
-
+<mat-list>
+	<mat-list-item>
+		<ng-container *ngIf="results === 'loading'">
+			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+		</ng-container>
+		<ng-container *ngIf="results !== undefined && results !== 'loading'">
+			Results: {{results}}
+		</ng-container>
+	</mat-list-item>
 </mat-list>

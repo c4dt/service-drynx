@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { ReactiveFormsModule } from '@angular/forms'
 import { MatButtonModule, MatListModule, MatGridListModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatTableModule } from '@angular/material'
+import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 
 import { AppComponent } from './app.component'
@@ -26,6 +27,7 @@ import { DataproviderViewerComponent } from './dataprovider-viewer/dataprovider-
     MatButtonModule,
     MatListModule,
     MatOptionModule,
+    MatProgressBarModule,
     MatSelectModule,
     MatTableModule
   ],
