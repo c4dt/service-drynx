@@ -28,6 +28,13 @@ export class Client {
   }
 
   async run (sq: SurveyQuery): Promise<List<number>> {
+    if (sq.query === undefined) {
+      throw new Error('no query defined')
+    }
+    if (sq.query.operation === undefined) {
+      throw new Error('no operation defined')
+    }
+
     sq.clientpubkey = this.keys.point.marshalBinary()
 
     const ret = await this.connection.send<ResponseDP>(sq, ResponseDP)
@@ -44,7 +51,7 @@ export class Client {
       throw new Error('group without results')
     }
 
-    return vector.content.map(text => {
+    const results = vector.content.map(text => {
       if (text.c === undefined || text.k === undefined) {
         throw new Error('an encrypted vector element is missing required fields')
       }
@@ -56,6 +63,15 @@ export class Client {
 
       return decrypted
     })
+
+    if (sq.query.operation.nameop === 'mean') {
+      if (results.length !== 2) {
+        throw new Error('wrong shape of results')
+      }
+
+      return List.of(results[0] / results[1])
+    }
+
     return List(results)
   }
 }
