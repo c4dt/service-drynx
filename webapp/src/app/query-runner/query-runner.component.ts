@@ -24,12 +24,14 @@ export class QueryRunnerComponent {
   })
 
   public launchQuery: SurveyQuery | undefined
-  public results: List<number> | 'loading' | undefined
+  public state: ['nothing-ran'] | ['loading'] | ['loaded', List<Number>] | ['errored', Error]
 
   constructor (
     private readonly client: ClientService,
     private readonly config: ConfigService
-  ) {}
+  ) {
+    this.state = ['nothing-ran']
+  }
 
   buildQuery (): SurveyQuery | undefined {
     const operation = this.queryBuilder.get('operation')
@@ -77,7 +79,14 @@ export class QueryRunnerComponent {
   }
 
   async runQuery (query: SurveyQuery): Promise<void> {
-    this.results = 'loading'
-    this.results = await this.client.run(query)
+    this.state = ['loading']
+
+    try {
+      const results = await this.client.run(query)
+      this.state = ['loaded', results]
+    } catch (e) {
+      const error = (e instanceof Error) ? e : new Error(e)
+      this.state = ['errored', error]
+    }
   }
 }

@@ -26,11 +26,14 @@
 
 <mat-list>
 	<mat-list-item>
-		<ng-container *ngIf="results === 'loading'">
+		<ng-container *ngIf="state[0] === 'loading'">
 			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 		</ng-container>
-		<ng-container *ngIf="results !== undefined && results !== 'loading'">
-			Results: {{results.toJS()}}
+		<ng-container *ngIf="state[0] === 'errored'">
+			Error: {{state[1].message}}
+		</ng-container>
+		<ng-container *ngIf="state[0] === 'loaded'">
+			Result: {{state[1].toJS()}}
 		</ng-container>
 	</mat-list-item>
 </mat-list>
