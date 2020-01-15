@@ -55,4 +55,23 @@ describe('pairing', function () {
       }
     }
   })
+
+  it('should keep already computed decryption', () => {
+    const kp = KeyPair.random()
+    const i = 123
+
+    let crypto = new Crypto()
+    const enc = crypto.encryptInt(kp.point, i)
+    crypto = new Crypto()
+
+    const firstDecryptStart = Date.now()
+    crypto.decryptInt(kp.scalar, enc)
+    const firstDecryptDuration = Date.now() - firstDecryptStart
+
+    const secondDecryptStart = Date.now()
+    crypto.decryptInt(kp.scalar, enc)
+    const secondDecryptDuration = Date.now() - secondDecryptStart
+
+    expect(secondDecryptDuration).toBeLessThan(firstDecryptDuration)
+  })
 })

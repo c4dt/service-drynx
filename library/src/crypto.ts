@@ -38,9 +38,10 @@ interface Encrypted {
  * Basic LibDrynx methods that can be used to encrypt and decrypt values.
  */
 export class Crypto {
-  static readonly maxInt = 10000
+  static readonly maxInt = 200000
 
-  private computed: Map<Point, number>
+  // Point.toString -> decrypted
+  private computed: Map<string, number>
 
   constructor () {
     this.computed = Map()
@@ -53,7 +54,7 @@ export class Crypto {
    */
   encryptInt (pub: Point, i: number): CipherText {
     const point = Crypto.intToPoint(i)
-    this.computed = this.computed.set(point, i)
+    this.computed = this.computed.set(point.toString(), i)
 
     const enc = Crypto.encryptPoint(pub, point)
     return enc.CT
@@ -68,13 +69,13 @@ export class Crypto {
    */
   decryptInt (priv: Scalar, cipher: CipherText, checkNeg: boolean = false): number {
     const point = Crypto.decryptPoint(priv, cipher)
-    const found = this.computed.get(point)
+    const found = this.computed.get(point.toString())
     if (found !== undefined) {
       return found
     }
 
     const ret = Crypto.pointtoInt(point, checkNeg)
-    this.computed = this.computed.set(point, ret)
+    this.computed = this.computed.set(point.toString(), ret)
 
     return ret
   }
@@ -133,7 +134,6 @@ export class Crypto {
    * This solves the discreet log problem by simply trying out all scalar values in
    * ascending value.
    * If checkNeg is true, it tries to find the number in a zig-zag way: 0, 1, -1, 2, -2, ...
-   * TODO: add a static table to speed up lookups of known numbers.
    * @param p
    * @param checkNeg
    */
