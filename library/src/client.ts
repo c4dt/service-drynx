@@ -49,7 +49,12 @@ export class Client {
         throw new Error('an encrypted vector element is missing required fields')
       }
 
-      return this.crypto.decryptInt(text)
+      const decrypted = this.crypto.decryptInt(text)
+      if (decrypted === undefined) {
+        throw new Error('unable to decrypt result')
+      }
+
+      return decrypted
     })
     return List(results)
   }

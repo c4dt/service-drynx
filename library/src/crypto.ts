@@ -38,7 +38,7 @@ interface Encrypted {
  * Basic LibDrynx methods that can be used to encrypt and decrypt values.
  */
 export class Crypto {
-  static readonly maxInt = 20000
+  private static readonly maxInt = 200000
 
   // Point.toString -> decrypted
   private computed: Map<string, number>
@@ -51,8 +51,6 @@ export class Crypto {
 
   /**
    * Encrypts an integer so that it can be used in homomorphic operations.
-   * @param pub
-   * @param i
    */
   encryptInt (i: number): CipherText {
     const point = Crypto.intToPoint(i)
@@ -64,12 +62,9 @@ export class Crypto {
 
   /**
    * Decrypts the integer found in the point. As the final step of the decryption
-   * involves solving the discreet log problem, it will only solve for integers < maxInt.
-   * @param priv
-   * @param cipher
-   * @param checkNeg
+   * involves solving the discret log problem, it will return undefined when out of bound.
    */
-  decryptInt (cipher: CipherText, checkNeg: boolean = false): number {
+  decryptInt (cipher: CipherText, checkNeg: boolean = false): number | undefined {
     const point = this.decryptPoint(cipher)
     const found = this.computed.get(point.toString())
     if (found !== undefined) {
@@ -77,15 +72,16 @@ export class Crypto {
     }
 
     const ret = Crypto.pointtoInt(point, checkNeg)
-    this.computed = this.computed.set(point.toString(), ret)
+    if (ret === undefined) {
+      return undefined
+    }
 
+    this.computed = this.computed.set(point.toString(), ret)
     return ret
   }
 
   /**
    * ElGamal encryption of a message that has been mapped to a point m.
-   * @param pub
-   * @param m
    */
   encryptPoint (m: Point): Encrypted {
     const B = Suite.point().base()
@@ -99,8 +95,6 @@ export class Crypto {
 
   /**
    * ElGamal decryption.
-   * @param priv
-   * @param c
    */
   decryptPoint (cipher: CipherText): Point {
     if (cipher.k === undefined || cipher.c === undefined) {
@@ -116,7 +110,6 @@ export class Crypto {
   /**
    * Paillier encryption (at least I think so ;) of a number to let it be used in
    * homomorphic operations.
-   * @param n
    */
   static intToPoint (n: number): Point {
     const neg = n < 0
@@ -136,10 +129,8 @@ export class Crypto {
    * This solves the discreet log problem by simply trying out all scalar values in
    * ascending value.
    * If checkNeg is true, it tries to find the number in a zig-zag way: 0, 1, -1, 2, -2, ...
-   * @param p
-   * @param checkNeg
    */
-  static pointtoInt (toReverse: Point, checkNeg: boolean): number {
+  static pointtoInt (toReverse: Point, checkNeg: boolean): number | undefined {
     const base = Suite.point().base()
     const zero = Suite.scalar().zero()
     const one = Suite.scalar().one()
@@ -162,6 +153,6 @@ export class Crypto {
       }
     }
 
-    throw new Error("didn't find discrete log")
+    return undefined
   }
 }
