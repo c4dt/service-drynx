@@ -21,8 +21,9 @@ export class Client {
     }
     this.connection = new Cothority.network.connection.WebSocketConnection(trimmedURL, 'drynx')
 
-    this.keys = KeyPair.random()
-    this.crypto = new Crypto()
+    const keys = KeyPair.random()
+    this.crypto = new Crypto(keys)
+    this.keys = keys
   }
 
   async run (sq: SurveyQuery): Promise<number[]> {
@@ -47,7 +48,7 @@ export class Client {
         throw new Error('an encrypted vector element is missing required fields')
       }
 
-      return this.crypto.decryptInt(this.keys.scalar, text)
+      return this.crypto.decryptInt(text)
     })
   }
 }

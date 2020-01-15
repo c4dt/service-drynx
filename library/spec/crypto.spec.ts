@@ -36,21 +36,24 @@ describe('pairing', function () {
 
   it('should crypt and decrypt a point', () => {
     const kp = KeyPair.random()
+    const crypto = new Crypto(kp)
     const p = Suite.point().pick()
-    const enc = Crypto.encryptPoint(kp.point, p)
-    const dec = Crypto.decryptPoint(kp.scalar, enc.CT)
+
+    const enc = crypto.encryptPoint(p)
+    const dec = crypto.decryptPoint(enc.CT)
+
     expect(dec.equals(p)).toBeTrue()
   })
 
   it('should crypt and decrypt an integer', () => {
     const kp = KeyPair.random()
     const mi = Crypto.maxInt
-    const crypto = new Crypto()
+    const crypto = new Crypto(kp)
     for (const ii of [0, 1, mi / 2, mi / 3]) {
       const iint = Math.floor(ii)
       for (const i of [iint, -iint]) {
-        const enc = crypto.encryptInt(kp.point, i)
-        const dec = crypto.decryptInt(kp.scalar, enc, true)
+        const enc = crypto.encryptInt(i)
+        const dec = crypto.decryptInt(enc, true)
         expect(dec).toBe(i)
       }
     }
@@ -60,16 +63,16 @@ describe('pairing', function () {
     const kp = KeyPair.random()
     const i = 123
 
-    let crypto = new Crypto()
-    const enc = crypto.encryptInt(kp.point, i)
-    crypto = new Crypto()
+    let crypto = new Crypto(kp)
+    const enc = crypto.encryptInt(i)
+    crypto = new Crypto(kp)
 
     const firstDecryptStart = Date.now()
-    crypto.decryptInt(kp.scalar, enc)
+    crypto.decryptInt(enc)
     const firstDecryptDuration = Date.now() - firstDecryptStart
 
     const secondDecryptStart = Date.now()
-    crypto.decryptInt(kp.scalar, enc)
+    crypto.decryptInt(enc)
     const secondDecryptDuration = Date.now() - secondDecryptStart
 
     expect(secondDecryptDuration).toBeLessThan(firstDecryptDuration)

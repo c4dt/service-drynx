@@ -13,7 +13,7 @@ import { Map } from 'immutable'
  * which corresponds most of the time to a private/public keypair.
  */
 export class KeyPair {
-  point: Point
+  readonly point: Point
 
   constructor (public readonly scalar: Scalar) {
     this.point = new BN256G1Point()
@@ -38,12 +38,14 @@ interface Encrypted {
  * Basic LibDrynx methods that can be used to encrypt and decrypt values.
  */
 export class Crypto {
-  static readonly maxInt = 200000
+  static readonly maxInt = 20000
 
   // Point.toString -> decrypted
   private computed: Map<string, number>
 
-  constructor () {
+  constructor (
+    private readonly keypair: KeyPair
+  ) {
     this.computed = Map()
   }
 
@@ -52,11 +54,11 @@ export class Crypto {
    * @param pub
    * @param i
    */
-  encryptInt (pub: Point, i: number): CipherText {
+  encryptInt (i: number): CipherText {
     const point = Crypto.intToPoint(i)
     this.computed = this.computed.set(point.toString(), i)
 
-    const enc = Crypto.encryptPoint(pub, point)
+    const enc = this.encryptPoint(point)
     return enc.CT
   }
 
@@ -67,8 +69,8 @@ export class Crypto {
    * @param cipher
    * @param checkNeg
    */
-  decryptInt (priv: Scalar, cipher: CipherText, checkNeg: boolean = false): number {
-    const point = Crypto.decryptPoint(priv, cipher)
+  decryptInt (cipher: CipherText, checkNeg: boolean = false): number {
+    const point = this.decryptPoint(cipher)
     const found = this.computed.get(point.toString())
     if (found !== undefined) {
       return found
@@ -85,11 +87,11 @@ export class Crypto {
    * @param pub
    * @param m
    */
-  static encryptPoint (pub: Point, m: Point): Encrypted {
+  encryptPoint (m: Point): Encrypted {
     const B = Suite.point().base()
     const r = Suite.scalar().pick((l: number) => randomBytes(l))
     const k = Suite.point().mul(r, B)
-    const S = Suite.point().mul(r, pub)
+    const S = Suite.point().mul(r, this.keypair.point)
     const c = Suite.point().add(S, m)
 
     return { CT: new CipherText({ k: k.toProto(), c: c.toProto() }), r }
@@ -100,14 +102,14 @@ export class Crypto {
    * @param priv
    * @param c
    */
-  static decryptPoint (priv: Scalar, cipher: CipherText): Point {
+  decryptPoint (cipher: CipherText): Point {
     if (cipher.k === undefined || cipher.c === undefined) {
       throw new Error('badly defined CipherText')
     }
     const k = PointFactory.fromProto(cipher.k)
     const c = PointFactory.fromProto(cipher.c)
 
-    const S = Suite.point().mul(priv, k)
+    const S = Suite.point().mul(this.keypair.scalar, k)
     return Suite.point().sub(c, S)
   }
 
