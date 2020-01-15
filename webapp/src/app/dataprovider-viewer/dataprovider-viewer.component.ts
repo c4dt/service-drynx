@@ -1,4 +1,4 @@
-import { List } from 'immutable'
+import { List, Map } from 'immutable'
 
 import { Component, Input } from '@angular/core'
 
@@ -54,12 +54,9 @@ export class Table {
   }
 
   public toObject (): TableObject {
-    const empty: { [_: string]: [ColumnType, TableElement] } = {}
     return this.rows.map(row => this.types.zip(row).zip(this.header)
-      .reduce((acc, [[type, value], name]) => {
-        acc[name] = [type, Table.parseWithType(type, value)]
-        return acc
-      }, empty)
+      .reduce((acc, [[type, value], name]) =>
+        acc.set(name, [type, Table.parseWithType(type, value)]), Map())
     ).toJS()
   }
 }
