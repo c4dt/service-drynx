@@ -15,43 +15,16 @@ describe('pairing', function () {
     expect(pp.equals(p)).toBeTruthy()
   })
 
-  it('should solve the discreet log problem for positive numbers', () => {
-    for (const ii of [0, 1, 12, 123, 1234]) {
-      const i = Math.floor(ii)
-      const enc = Crypto.intToPoint(i)
-      const dec = Crypto.pointtoInt(enc, new Range(0, 12345))
-      expect(dec).toBe(i)
-    }
-  })
-
-  it('should solve the discreet log problem for negative numbers', () => {
-    for (const ii of [0, -1, -12, -123, -1234]) {
-      const i = Math.floor(ii)
-      const enc = Crypto.intToPoint(i)
-      const dec = Crypto.pointtoInt(enc, new Range(-12345, 0))
-      expect(dec).toBe(i)
-    }
-  })
-
-  it('should crypt and decrypt a point', () => {
-    const kp = KeyPair.random()
-    const crypto = new Crypto(kp)
-    const p = Suite.point().pick()
-
-    const enc = crypto.encryptPoint(p)
-    const dec = crypto.decryptPoint(enc.CT)
-
-    expect(p.equals(dec)).toBeTrue()
-  })
-
   it('should crypt and decrypt an integer', () => {
     const kp = KeyPair.random()
-    const crypto = new Crypto(kp)
+    const cryptor = new Crypto(kp)
+    const decryptor = new Crypto(kp)
+
     for (const ii of [0, 1, 12, 123, 1234]) {
       const iint = Math.floor(ii)
       for (const i of [iint, -iint]) {
-        const enc = crypto.encryptInt(i)
-        const dec = crypto.decryptInt(enc, new Range(-12345, 12345))
+        const enc = cryptor.encryptInt(i)
+        const dec = decryptor.decryptInt(enc, new Range(-12345, 12345))
         expect(dec).toBe(i)
       }
     }
@@ -90,5 +63,26 @@ describe('pairing', function () {
     testDecryptWithWarmer((crypto, clear, _) => {
       crypto.warmDecryption(new Range(-clear, clear))
     })
+  })
+
+  it('should restart from already computed', () => {
+    const kp = KeyPair.random()
+    const i = 123
+
+    let crypto = new Crypto(kp)
+    const enc = crypto.encryptInt(i)
+    crypto = new Crypto(kp)
+
+    const coldDecryptStart = Date.now()
+    const coldDecrypted = crypto.decryptInt(enc, new Range(0, i - 1))
+    const coldDecryptDuration = Date.now() - coldDecryptStart
+    expect(coldDecrypted).toBeUndefined()
+
+    const warmDecryptStart = Date.now()
+    const warmDecrypted = crypto.decryptInt(enc, new Range(0, i))
+    const warmDecryptDuration = Date.now() - warmDecryptStart
+    expect(warmDecrypted).toBe(i)
+
+    expect(warmDecryptDuration).toBeLessThan(coldDecryptDuration)
   })
 })
