@@ -8,6 +8,8 @@ import * as Suite from './suite'
 import { CipherText } from './conv'
 import { Map } from 'immutable'
 
+import { strict as assert } from 'assert'
+
 /**
  * Holds a keypair of a scalar/point pair, where the point is the scalar * Base,
  * which corresponds most of the time to a private/public keypair.
@@ -34,12 +36,21 @@ interface Encrypted {
   r: Scalar
 }
 
+export class Range {
+  constructor (
+    public readonly low: number,
+    public readonly high: number
+  ) {
+    if (low > high) {
+      throw new Error('lower bound is greater than higher bound')
+    }
+  }
+}
+
 /**
  * Basic LibDrynx methods that can be used to encrypt and decrypt values.
  */
 export class Crypto {
-  private static readonly maxInt = 200000
-
   // Point.toString -> decrypted
   private computed: Map<string, number>
 
@@ -47,6 +58,13 @@ export class Crypto {
     private readonly keypair: KeyPair
   ) {
     this.computed = Map()
+  }
+
+  warmDecryption (range: Range): void {
+    const max = Math.max(Math.abs(range.low), Math.abs(range.high))
+    const enc = this.encryptInt(max)
+    const dec = this.decryptInt(enc, range)
+    assert.strictEqual(max, dec)
   }
 
   /**
@@ -64,14 +82,18 @@ export class Crypto {
    * Decrypts the integer found in the point. As the final step of the decryption
    * involves solving the discret log problem, it will return undefined when out of bound.
    */
-  decryptInt (cipher: CipherText, checkNeg: boolean = false): number | undefined {
+  decryptInt (cipher: CipherText, range?: Range): number | undefined {
+    if (range === undefined) {
+      range = new Range(0, Number.MAX_SAFE_INTEGER)
+    }
+
     const point = this.decryptPoint(cipher)
     const found = this.computed.get(point.toString())
     if (found !== undefined) {
       return found
     }
 
-    const ret = Crypto.pointtoInt(point, checkNeg)
+    const ret = Crypto.pointtoInt(point, range)
     if (ret === undefined) {
       return undefined
     }
@@ -130,15 +152,17 @@ export class Crypto {
    * ascending value.
    * If checkNeg is true, it tries to find the number in a zig-zag way: 0, 1, -1, 2, -2, ...
    */
-  static pointtoInt (toReverse: Point, checkNeg: boolean): number | undefined {
+  static pointtoInt (toReverse: Point, range: Range): number | undefined {
     const base = Suite.point().base()
     const zero = Suite.scalar().zero()
     const one = Suite.scalar().one()
 
     const onePoint = Suite.point().mul(one, base)
+    const max = Math.max(Math.abs(range.low), Math.abs(range.high))
+    const checkNeg = range.low < 0 || range.high < 0
 
     const guess = Suite.point().mul(zero, base)
-    for (let i = 0; i <= this.maxInt; i++, guess.add(guess, onePoint)) {
+    for (let i = 0; i <= max; i++, guess.add(guess, onePoint)) {
       if (toReverse.equals(guess)) {
         return i
       }

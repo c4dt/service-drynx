@@ -1,5 +1,6 @@
 import * as Suite from '../src/suite'
-import { KeyPair, Crypto } from '../src/crypto'
+import { KeyPair, Crypto, Range } from '../src/crypto'
+import { CipherText } from '../src/conv'
 
 describe('pairing', function () {
   it('should create keypair', () => {
@@ -18,16 +19,16 @@ describe('pairing', function () {
     for (const ii of [0, 1, 12, 123, 1234]) {
       const i = Math.floor(ii)
       const enc = Crypto.intToPoint(i)
-      const dec = Crypto.pointtoInt(enc, false)
+      const dec = Crypto.pointtoInt(enc, new Range(0, 12345))
       expect(dec).toBe(i)
     }
   })
 
   it('should solve the discreet log problem for negative numbers', () => {
-    for (const ii of [0, 1, 12, 123, 1234]) {
+    for (const ii of [0, -1, -12, -123, -1234]) {
       const i = Math.floor(ii)
       const enc = Crypto.intToPoint(i)
-      const dec = Crypto.pointtoInt(enc, true)
+      const dec = Crypto.pointtoInt(enc, new Range(-12345, 0))
       expect(dec).toBe(i)
     }
   })
@@ -50,28 +51,44 @@ describe('pairing', function () {
       const iint = Math.floor(ii)
       for (const i of [iint, -iint]) {
         const enc = crypto.encryptInt(i)
-        const dec = crypto.decryptInt(enc, true)
+        const dec = crypto.decryptInt(enc, new Range(-12345, 12345))
         expect(dec).toBe(i)
       }
     }
   })
 
-  it('should keep already computed decryption', () => {
+  function testDecryptWithWarmer (warmer: (crypto: Crypto, clear: number, encrypted: CipherText) => void): void {
     const kp = KeyPair.random()
     const i = 123
 
     let crypto = new Crypto(kp)
     const enc = crypto.encryptInt(i)
+
     crypto = new Crypto(kp)
+    const coldDecryptStart = Date.now()
+    const coldDecrypted = crypto.decryptInt(enc)
+    const coldDecryptDuration = Date.now() - coldDecryptStart
+    expect(coldDecrypted).toBe(i)
 
-    const firstDecryptStart = Date.now()
-    crypto.decryptInt(enc)
-    const firstDecryptDuration = Date.now() - firstDecryptStart
+    crypto = new Crypto(kp)
+    warmer(crypto, i, enc)
+    const warmDecryptStart = Date.now()
+    const warmDecrypted = crypto.decryptInt(enc)
+    const warmDecryptDuration = Date.now() - warmDecryptStart
+    expect(warmDecrypted).toBe(i)
 
-    const secondDecryptStart = Date.now()
-    crypto.decryptInt(enc)
-    const secondDecryptDuration = Date.now() - secondDecryptStart
+    expect(warmDecryptDuration).toBeLessThan(coldDecryptDuration)
+  }
 
-    expect(secondDecryptDuration).toBeLessThan(firstDecryptDuration)
+  it('should keep already computed decryption, with decryptInt', () => {
+    testDecryptWithWarmer((crypto, _, enc) => {
+      crypto.decryptInt(enc)
+    })
+  })
+
+  it('should keep already computed decryption, with warmDecryption', () => {
+    testDecryptWithWarmer((crypto, clear, _) => {
+      crypto.warmDecryption(new Range(-clear, clear))
+    })
   })
 })
