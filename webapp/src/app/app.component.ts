@@ -6,7 +6,8 @@ import * as csv from 'papaparse'
 import { ColumnID } from '@c4dt/drynx'
 
 import { ConfigService } from './config.service'
-import { ColumnType, Table } from './dataprovider-viewer/dataprovider-viewer.component'
+import { ColumnType, ColumnMultiplied, ColumnDatedYears, ColumnDatedDays, ColumnRaw } from './columns'
+import { Table } from './dataprovider-viewer/dataprovider-viewer.component'
 
 @Component({
   selector: 'app-root',
@@ -14,13 +15,13 @@ import { ColumnType, Table } from './dataprovider-viewer/dataprovider-viewer.com
 })
 export class AppComponent {
   public datasets: List<Promise<Table>>
-  public columns: Promise<List<ColumnID>>
+  public columns: Promise<List<[ColumnType, ColumnID]>>
 
   constructor (
     private readonly config: ConfigService
   ) {
     this.datasets = List(this.config.DataProviders.map(async dp => AppComponent.fetchDataset(dp.datasetURL, dp.datasetTypesURL)))
-    this.columns = Promise.all(this.datasets).then(ret => AppComponent.getUsableColumns(List(ret)))
+    this.columns = Promise.all(this.datasets).then(ret => AppComponent.getRelevantColumns(List(ret)))
   }
 
   private static async getAndParseCSV (url: URL): Promise<List<List<string>>> {
@@ -47,11 +48,32 @@ export class AppComponent {
     }
     const types = typesStr.map(t => {
       switch (t) {
-        case 'number': return ColumnType.Number
-        case 'date': return ColumnType.Date
-        case 'string': return ColumnType.String
-        default: throw new Error(`unknown dataset's type: ${t}`)
+        case 'string': return new ColumnRaw()
       }
+
+      const numericMatches = t.match(/^\*(\d+)$/)
+      if (numericMatches !== null) {
+        const value = Number.parseInt(numericMatches[1])
+        if (Number.isNaN(value)) {
+          throw new Error(`unable to parse as int: ${numericMatches[1]}`)
+        }
+        return new ColumnMultiplied(value)
+      }
+
+      const dateMatches = t.match(/^date\/(years|days)\+(\d+)$/)
+      if (dateMatches !== null) {
+        const value = Number.parseInt(dateMatches[2])
+        if (Number.isNaN(value)) {
+          throw new Error(`unable to parse as int: ${dateMatches[2]}`)
+        }
+        const date = new Date(value, 0)
+        switch (dateMatches[1]) {
+          case 'years': return new ColumnDatedYears(date)
+          case 'days': return new ColumnDatedDays(date)
+        }
+      }
+
+      throw new Error(`unknown dataset's type: ${t}`)
     })
 
     const header = (await datasetCSV).get(0)
@@ -59,10 +81,11 @@ export class AppComponent {
       throw new Error("dataset doesn't have any row")
     }
 
-    return new Table(types, header, (await datasetCSV).shift())
+    const content = (await datasetCSV).shift()
+    return new Table(types, header, content)
   }
 
-  private static getUsableColumns (datasets: List<Table>): List<ColumnID> {
+  private static getRelevantColumns (datasets: List<Table>): List<[ColumnType, ColumnID]> {
     const first = datasets.get(0)
     if (first === undefined) {
       return List()
@@ -72,7 +95,8 @@ export class AppComponent {
     const merged = datasets.shift().reduce((acc, dataset) => {
       return acc.zipAll(dataset.types.zip(dataset.header))
         .map(([left, right]) => {
-          if (left === undefined || left[0] !== right[0] || left[1] !== right[1]) {
+          // TODO check that types are the same
+          if (left === undefined || left[1] !== right[1]) {
             return undefined
           }
           return left
@@ -85,7 +109,6 @@ export class AppComponent {
       .filter(column => column !== undefined)
 
     return filtered
-      .filter(([t, _]) => t === ColumnType.Number || t === ColumnType.Date)
-      .map(([_, id]) => id)
+      .filter(([t, _]) => !(t instanceof ColumnRaw))
   }
 }

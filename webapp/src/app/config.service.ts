@@ -10,6 +10,7 @@ const datasetBaseURL = 'http://10.90.47.29:17253'
 })
 export class ConfigService {
   public readonly ClientURL = new URL('ws://10.90.47.29:21047')
+  public readonly TotalRowCount = 30
 
   public readonly DataProviders = [{
     datasetURL: new URL(`${datasetBaseURL}/1`),
