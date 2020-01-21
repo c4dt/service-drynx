@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 services:
-	git clone -b stainless https://github.com/c4dt/services.git
+	git clone -b drynx https://github.com/c4dt/services.git
 services/%: | services
 	@: nothing
 
@@ -18,6 +18,11 @@ kubernetes-deploy:
 	done
 	sed s,\$$ID,`ls kubernetes/datasets | sort | head -n1`, kubernetes/drynx.yaml | kubectl apply -f -
 	kubectl apply -f kubernetes/http-datasets.yaml
+
+.PHONY: kubernetes-refresh
+kubernetes-refresh:
+	kubectl get pods -oname | grep drynx-http-datasets | xargs kubectl delete
+	kubectl get pods | awk '/drynx-node/ {print $$1}' | xargs -I{} kubectl exec {} kill 1
 
 .PHONY: kubernetes-dump-config
 kubernetes-dump-config: kubernetes-deploy
