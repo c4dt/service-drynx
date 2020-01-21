@@ -71,7 +71,7 @@ export class Operation extends Message<Operation> {
     registerMessage('Operation', Operation, LogisticRegressionParameters)
   }
 
-  public readonly nameop: string | undefined
+  public nameop: string | undefined
   public readonly nbrinput: number | undefined
   public readonly nbroutput: number | undefined
   public readonly querymin: number | undefined

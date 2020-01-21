@@ -35,11 +35,20 @@ export class Client {
       throw new Error('no operation defined')
     }
 
+    const isStdDev = sq.query.operation.nameop === 'standard deviation'
+    if (isStdDev) {
+      sq.query.operation.nameop = 'variance'
+    }
+
     sq.clientpubkey = this.keys.point.marshalBinary()
 
     const ret = await this.connection.send<ResponseDP>(sq, ResponseDP)
     if (ret.data === undefined) {
       throw new Error('no results')
+    }
+
+    if (isStdDev) {
+      sq.query.operation.nameop = 'standard deviation'
     }
 
     const groups = Object.values(ret.data)
@@ -70,6 +79,20 @@ export class Client {
       }
 
       return List.of(results[0] / results[1])
+    }
+
+    if (sq.query.operation.nameop === 'variance' || isStdDev) {
+      if (results.length !== 3) {
+        throw new Error('wrong shape of results')
+      }
+
+      const mean = (results[0] / results[1])
+      const variance = results[2] / results[1] - mean * mean
+
+      if (isStdDev) {
+        return List.of(Math.sqrt(variance))
+      }
+      return List.of(variance)
     }
 
     return List(results)
