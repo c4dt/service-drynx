@@ -7,6 +7,8 @@ services/%: | services
 
 include services/mk/service.mk
 
+$Swebapp-build $Swebapp-test: $Slibrary-build
+
 .PHONY: kubernetes-deploy
 kubernetes-deploy:
 	kubectl delete configmap/datasets || :
