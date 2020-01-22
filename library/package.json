@@ -23,7 +23,7 @@
 	"homepage": "https://github.com/c4dt/service-drynx/tree/master/library#readme",
 	"dependencies": {
 		"@dedis/cothority": "^3.4.2",
-		"@dedis/kyber": "^3.4.2-p2001.915.447.0",
+		"@dedis/kyber": "^3.4.2-p2001.1716.2840.0",
 		"immutable": "^4.0.0-rc.12",
 		"protobufjs": "^6.8.8",
 		"tslib": "^1.10.0"
