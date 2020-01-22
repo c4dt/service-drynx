@@ -8,7 +8,7 @@ describe('client', function () {
   beforeEach(network.start)
   afterEach(network.stop)
 
-  it('connects to server', async function () {
+  xit('connects to server', async function () {
     const nodes = network.getNodes()
     const client = new lib.Client(nodes[0].url)
 
