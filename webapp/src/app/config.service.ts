@@ -3,41 +3,41 @@ import { Injectable } from '@angular/core'
 import * as cothority from '@dedis/cothority'
 import * as kyber from '@dedis/kyber'
 
-const datasetBaseURL = 'http://10.90.47.29:17253'
+const datasetBaseURL = 'https://demo.c4dt.org/drynx/datasets'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigService {
-  public readonly ClientURL = new URL('ws://10.90.47.29:21047')
+  public readonly ClientURL = new URL('ws://demo.c4dt.org/drynx/node')
   public readonly TotalRowCount = 30
 
   public readonly DataProviders = [{
     datasetURL: new URL(`${datasetBaseURL}/1`),
     datasetTypesURL: new URL(`${datasetBaseURL}/1_types`),
     identity: new cothority.network.ServerIdentity({
-      address: 'tcp://10.233.110.26:1234',
+      address: 'tcp://localhost:1234',
       public: Buffer.concat([
         kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-        Buffer.from('10a0b188fe473478fe9ba75cc2a3cc9d16cd2fffe5afd50aa446c4a4b6a947021220ab4553c89c3d1719f5281b4b8b617dcb7d10f8392ea552dd5fc45305d76f', 'hex')])
+        Buffer.from('502a8582994626225d2e04031522b104003534507796bec0ce91846a7ab5505750f692f0bbc15bab0e4be77b7950feb06cc3ef9c0954b7a5cd18c5541d5f743d', 'hex')])
     })
   }, {
     datasetURL: new URL(`${datasetBaseURL}/2`),
     datasetTypesURL: new URL(`${datasetBaseURL}/2_types`),
     identity: new cothority.network.ServerIdentity({
-      address: 'tcp://10.233.80.108:1234',
+      address: 'tcp://localhost:1236',
       public: Buffer.concat([
         kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-        Buffer.from('31aa1f16b7094e491be5459464300b99c50899e72c21478a93b41bf980763ea12f6fb8ab9affd7f2519b00f8581d7d1dabe666e0c1c705ced777558b18b53e3c', 'hex')])
+        Buffer.from('2e8bb550b30ca511162745bde6311eba7439c94a12f7406c369c704cdb326dbe28a04fd054a66a50d8189f93e8a55b5896371759b43c4cf02af109a6c8564b3a', 'hex')])
     })
   }, {
     datasetURL: new URL(`${datasetBaseURL}/3`),
     datasetTypesURL: new URL(`${datasetBaseURL}/3_types`),
     identity: new cothority.network.ServerIdentity({
-      address: 'tcp://10.233.123.194:1234',
+      address: 'tcp://localhost:1238',
       public: Buffer.concat([
         kyber.pairing.point.BN256G1Point.MARSHAL_ID,
-        Buffer.from('79b364b4991dd3721edb94f4c5b1d54ad1fd95086370c48c3849115d46399ff28ccdcd9a78e9f4a084069d4762c89ae71037c4b23af0e880280565a11c6693a4', 'hex')])
+        Buffer.from('79cca3dac2ed903e324a72d036210a329dfcc4418721687eb0007f5a09777b991bae1916e8ba7602cf0cc09b0ac530371db584545ea09b23101b3d9f59b82e57', 'hex')])
     })
   }]
 
