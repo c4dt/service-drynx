@@ -78,7 +78,7 @@ export class Client {
         throw new Error('wrong shape of results')
       }
 
-      return List.of(results[0] / results[1])
+      return List.of(Math.trunc(results[0] / results[1]))
     }
 
     if (sq.query.operation.nameop === 'variance' || isStdDev) {
@@ -90,9 +90,9 @@ export class Client {
       const variance = results[2] / results[1] - mean * mean
 
       if (isStdDev) {
-        return List.of(Math.sqrt(variance))
+        return List.of(Math.trunc(Math.sqrt(variance)))
       }
-      return List.of(variance)
+      return List.of(Math.trunc(variance))
     }
 
     return List(results)
