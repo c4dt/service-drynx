@@ -1,11 +1,13 @@
 import { List } from 'immutable'
 
-import { Operation } from '@c4dt/drynx'
+// XXX Columns -> List<Operation>
+// XXX Operation -> formatResults
 
 interface ColumnMapper<T> {
   kind: string
+  forResults (op: OperationType, results: List<number>): [ResultType, Result] | undefined
   forRow (value: string): T
-  forResults (totalRowCount: number, op: Operation, results: List<number>): T | undefined
+  equals (other: any): boolean
 }
 
 export class ColumnMultiplied implements ColumnMapper<number> {
@@ -24,8 +26,8 @@ export class ColumnMultiplied implements ColumnMapper<number> {
     return this.factor * num
   }
 
-  forResults (_: number, op: Operation, results: List<number>): number {
-    switch (op.nameop) {
+  forResults (op: OperationType, results: List<number>): ['number', number] {
+    switch (op) {
       case 'sum': {
         if (results.size !== 1) {
           throw new Error('unexpected shape')
@@ -34,7 +36,7 @@ export class ColumnMultiplied implements ColumnMapper<number> {
         if (sum === undefined) {
           throw new Error('unexpected shape')
         }
-        return this.factor * sum
+        return ['number', this.factor * sum]
       }
       case 'mean': {
         if (results.size !== 1) {
@@ -44,7 +46,7 @@ export class ColumnMultiplied implements ColumnMapper<number> {
         if (mean === undefined) {
           throw new Error('unexpected shape')
         }
-        return this.factor * mean
+        return ['number', this.factor * mean]
       }
       case 'standard deviation':
       case 'variance': {
@@ -56,19 +58,23 @@ export class ColumnMultiplied implements ColumnMapper<number> {
           throw new Error('unexpected shape')
         }
 
-        if (op.nameop === 'standard deviation') {
-          return this.factor * variance
+        if (op === 'standard deviation') {
+          return ['number', this.factor * variance]
         }
-        return this.factor * this.factor * variance
+        return ['number', this.factor * this.factor * variance]
       }
     }
 
     throw new Error('unknown operation')
   }
+
+  equals (other: any): boolean {
+    return other instanceof ColumnMultiplied && other.factor === this.factor
+  }
 }
 
 abstract class ColumnDated implements ColumnMapper<Date> {
-  abstract kind: string
+  abstract kind: ResultType
 
   constructor (
     private readonly dateSetter: (toSet: Date, value: number) => void,
@@ -86,7 +92,7 @@ abstract class ColumnDated implements ColumnMapper<Date> {
     return ret
   }
 
-  forResults (_1: number, _2: Operation, results: List<number>): Date {
+  forResults (_2: OperationType, results: List<number>): [ResultType, Date] {
     const date = results.get(0)
     if (date === undefined) {
       throw new Error('weird shape for a date')
@@ -94,12 +100,16 @@ abstract class ColumnDated implements ColumnMapper<Date> {
 
     const ret = new Date(this.offset.getTime())
     this.dateSetter(ret, date)
-    return ret
+    return [this.kind, ret]
+  }
+
+  equals (other: any): boolean {
+    return other instanceof ColumnDated && other.kind === this.kind
   }
 }
 
 export class ColumnDatedDays extends ColumnDated {
-  public readonly kind = 'dated/days'
+  public readonly kind = 'date/days'
 
   constructor (offset: Date) {
     super((toSet: Date, value: number) => toSet.setDate(value), offset)
@@ -107,7 +117,7 @@ export class ColumnDatedDays extends ColumnDated {
 }
 
 export class ColumnDatedYears extends ColumnDated {
-  public readonly kind = 'dated/years'
+  public readonly kind = 'date/years'
 
   constructor (offset: Date) {
     super((toSet: Date, value: number) => toSet.setFullYear(offset.getFullYear() + value), offset)
@@ -121,9 +131,76 @@ export class ColumnRaw implements ColumnMapper<string> {
     return value
   }
 
-  forResults (_1: number, _2: Operation, _3: List<number>): undefined {
+  forResults (_2: OperationType, _3: List<number>): undefined {
     return undefined
+  }
+
+  equals (other: any): boolean {
+    return other instanceof ColumnRaw
   }
 }
 
 export type ColumnType = ColumnMultiplied | ColumnDatedDays | ColumnDatedYears | ColumnRaw
+
+export type OperationType = 'sum' | 'mean' | 'variance' | 'standard deviation' | 'linear regression'
+export type ResultType = 'number' | 'date/days' | 'date/years' | 'string'
+export type Result = number | Date | string
+
+export class Operation {
+  constructor (
+    public readonly type: OperationType,
+    private readonly columns: List<ColumnType>
+  ) {}
+
+  formatResults (results: List<number>): List<[ResultType, Result]> {
+    switch (this.type) {
+      case 'linear regression':
+        // TODO assert this.columns instanceof ColumnMultiplied
+        return results.map(num => ['number', num])
+      default: {
+        const column = this.columns.get(0)
+        if (column === undefined || this.columns.size > 1) {
+          throw new Error()
+        }
+        const ret = column.forResults(this.type, results)
+        if (ret === undefined) {
+          throw new Error()
+        }
+        return List.of(ret)
+      }
+    }
+  }
+}
+
+export class Columns {
+  public readonly validOperations: List<Operation>
+
+  constructor (
+    public readonly items: List<ColumnType>
+  ) {
+    const item = items.get(0)
+    if (item !== undefined && items.size === 1) {
+      switch (item.kind) {
+        case 'multiplied': {
+          const ops: OperationType[] = ['sum', 'mean', 'variance', 'standard deviation']
+          this.validOperations = List(ops.map(op => new Operation(op, this.items)))
+          break
+        }
+        case 'date/days':
+        case 'date/years':
+          this.validOperations = List.of(new Operation('mean', this.items))
+          break
+        case 'raw':
+          this.validOperations = List.of()
+          break
+        default:
+          throw new Error()
+      }
+    } else if (items.size === 2) {
+      // TODO verify columns compatibility
+      this.validOperations = List.of(new Operation('linear regression', this.items))
+    } else {
+      this.validOperations = List()
+    }
+  }
+}

@@ -2,7 +2,7 @@
 	<mat-list>
 		<mat-list-item><mat-form-field>
 			<mat-label>column</mat-label>
-			<mat-select formControlName="column" (ngModelChange)="ngOnChanges()">
+			<mat-select formControlName="columns" (ngModelChange)="ngOnChanges()" multiple>
 				<mat-option *ngFor="let col of columns" [value]="col">
 					{{col[1]}}
 				</mat-option>
@@ -34,10 +34,20 @@
 		</ng-container>
 		<ng-container *ngIf="state[0] === 'loaded'">
 			Result:
-			<ng-container *ngIf="state[1][0].kind === 'dated/years'">{{state[1][1] | date:'yyyy'}}</ng-container>
-			<ng-container *ngIf="state[1][0].kind === 'dated/days'">{{state[1][1] | date}}</ng-container>
-			<ng-container *ngIf="state[1][0].kind !== 'dated/years' &&
-				state[1][0].kind !== 'dated/days'">{{state[1][1]}}</ng-container>
+			<ng-container *ngFor="let result of state[1]">
+				<ng-container *ngIf="result[0] === 'number'">
+					{{result[1] | number}}
+				</ng-container>
+				<ng-container *ngIf="result[0] === 'date/years'">
+					{{result[1] | date:'yyyy'}}
+				</ng-container>
+				<ng-container *ngIf="result[0] === 'date/days'">
+					{{result[1] | date}}
+				</ng-container>
+				<ng-container *ngIf="result[0] === 'string'">
+					{{result[1]}}
+				</ng-container>
+			</ng-container>
 		</ng-container>
 	</mat-list-item>
 </mat-list>
