@@ -1,10 +1,12 @@
+import { List } from 'immutable'
+import gauss from 'gaussian-elimination'
+
 import * as Cothority from '@dedis/cothority'
 import { addJSON } from '@dedis/cothority/protobuf' // dedis/cothority#2154
 
 import { SurveyQuery, ResponseDP } from './conv'
 import { KeyPair, Crypto } from './crypto'
 import proto from './proto.json'
-import { List } from 'immutable'
 
 export class Client {
   private readonly connection: Cothority.network.connection.WebSocketConnection;
@@ -73,26 +75,63 @@ export class Client {
       return decrypted
     })
 
-    if (sq.query.operation.nameop === 'mean') {
-      if (results.length !== 2) {
-        throw new Error('wrong shape of results')
+    switch (sq.query.operation.nameop) {
+      case 'mean':
+        if (results.length !== 2) {
+          throw new Error('wrong shape of results')
+        }
+        return List.of(Math.trunc(results[0] / results[1]))
+      case 'standard deviation':
+      case 'variance': {
+        if (results.length !== 3) {
+          throw new Error('wrong shape of results')
+        }
+
+        const mean = (results[0] / results[1])
+        const variance = results[2] / results[1] - mean * mean
+
+        if (isStdDev) {
+          return List.of(Math.trunc(Math.sqrt(variance)))
+        }
+        return List.of(Math.trunc(variance))
       }
+      case 'lin_reg': {
+        const d = Math.round((-5 + Math.sqrt(5 * 5 - 4 * (4 - 2 * results.length))) / 2)
+        if (d < 1) {
+          throw new Error()
+        }
 
-      return List.of(Math.trunc(results[0] / results[1]))
-    }
+        // TODO ugly, taken from golang
 
-    if (sq.query.operation.nameop === 'variance' || isStdDev) {
-      if (results.length !== 3) {
-        throw new Error('wrong shape of results')
+        const matrixAugmented: number[][] = new Array(d + 1)
+        for (let i = 0; i < matrixAugmented.length; i++) {
+          matrixAugmented[i] = new Array(d + 2)
+        }
+
+        let s = 0
+        let l = d + 1
+        let k = d + 1
+        let i = 0
+        for (let j = 0; j < results.length - d - 1; j++) {
+          if (j === l) {
+            k--
+            l = l + k
+            i++
+            s = 0
+          }
+          matrixAugmented[i][i + s] = results[j]
+          if (i !== i + s) {
+            matrixAugmented[i + s][i] = results[j]
+          }
+          s++
+        }
+
+        for (let j = results.length - d - 1; j < results.length; j++) {
+          matrixAugmented[j - results.length + d + 1][d + 1] = results[j]
+        }
+
+        return List(gauss(matrixAugmented))
       }
-
-      const mean = (results[0] / results[1])
-      const variance = results[2] / results[1] - mean * mean
-
-      if (isStdDev) {
-        return List.of(Math.trunc(Math.sqrt(variance)))
-      }
-      return List.of(Math.trunc(variance))
     }
 
     return List(results)

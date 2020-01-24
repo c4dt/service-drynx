@@ -24,6 +24,7 @@
 	"dependencies": {
 		"@dedis/cothority": "^3.4.2",
 		"@dedis/kyber": "^3.4.2-p2001.1716.2840.0",
+		"gaussian-elimination": "^1.0.2",
 		"immutable": "^4.0.0-rc.12",
 		"protobufjs": "^6.8.8",
 		"tslib": "^1.10.0"
