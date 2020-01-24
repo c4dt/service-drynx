@@ -32,9 +32,8 @@
 		<ng-container *ngIf="state[0] === 'errored'">
 			Error: {{state[1].message}}
 		</ng-container>
-		<ng-container *ngIf="state[0] === 'loaded'">
-			Result:
-			<ng-container *ngFor="let result of state[1]">
+		<ng-container *ngIf="state[0] === 'loaded' && state[1].size === 1">
+			Result: <ng-container *ngFor="let result of state[1]">
 				<ng-container *ngIf="result[0] === 'number'">
 					{{result[1] | number}}
 				</ng-container>
@@ -48,6 +47,9 @@
 					{{result[1]}}
 				</ng-container>
 			</ng-container>
+		</ng-container>
+		<ng-container *ngIf="state[0] === 'loaded' && state[1].size > 1">
+			<app-results-plotter [betas]="state[1].map(extractSecond)"></app-results-plotter>
 		</ng-container>
 	</mat-list-item>
 </mat-list>

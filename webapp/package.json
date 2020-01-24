@@ -29,6 +29,7 @@
     "@c4dt/drynx": "file:../library",
     "@dedis/cothority": "^3.4.2",
     "@dedis/kyber": "^3.4.1",
+    "angular-plotly.js": "^1.5.0",
     "immutable": "^4.0.0-rc.12",
     "papaparse": "^5.1.0",
     "rxjs": "~6.4.0",

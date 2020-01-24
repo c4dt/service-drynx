@@ -133,6 +133,10 @@ export class QueryRunnerComponent implements OnChanges {
     return val
   }
 
+  extractSecond<T> (t: [any, T]): T {
+    return t[1]
+  }
+
   async runQuery ([operation, query]: [Operation, SurveyQuery]): Promise<void> {
     this.state = ['loading']
 
