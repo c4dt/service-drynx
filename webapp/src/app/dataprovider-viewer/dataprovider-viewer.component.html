@@ -14,7 +14,10 @@
 					<ng-container *ngIf="row[col][0].kind === 'dated/days'">
 						{{row[col][1] | date}}
 					</ng-container>
-					<ng-container *ngIf="row[col][0].kind !== 'dated/days' && row[col][0].kind !== 'dated/years'">
+					<ng-container *ngIf="row[col][0].kind === 'multiplied'">
+						{{row[col][1] | number}}
+					</ng-container>
+					<ng-container *ngIf="row[col][0].kind === 'raw'">
 						{{row[col][1]}}
 					</ng-container>
 				</mat-cell>
