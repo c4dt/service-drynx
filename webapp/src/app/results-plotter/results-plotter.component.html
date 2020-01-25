@@ -1,1 +1,19 @@
-<plotly-plot *ngIf="graph !== undefined" [data]="graph.data"></plotly-plot>
+<ng-container *ngIf="results !== undefined && results !== null && results.size === 1">
+	<ng-container *ngFor="let result of results">
+		<ng-container *ngIf="result[0] === 'number'">
+			{{result[1] | number}}
+		</ng-container>
+		<ng-container *ngIf="result[0] === 'date/years'">
+			{{result[1] | date:'yyyy'}}
+		</ng-container>
+		<ng-container *ngIf="result[0] === 'date/days'">
+			{{result[1] | date}}
+		</ng-container>
+		<ng-container *ngIf="result[0] === 'string'">
+			{{result[1]}}
+		</ng-container>
+	</ng-container>
+</ng-container>
+<ng-container *ngIf="results !== undefined && results !== null && results.size > 1">
+	<plotly-plot [data]="graph"></plotly-plot>
+</ng-container>
