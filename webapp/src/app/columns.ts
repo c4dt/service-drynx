@@ -1,9 +1,7 @@
 import { List } from 'immutable'
 
-// XXX Columns -> List<Operation>
-// XXX Operation -> formatResults
-
 interface ColumnMapper<T> {
+  name: string
   kind: string
   forResults (op: OperationType, results: List<number>): [ResultType, Result] | undefined
   forRow (value: string): T
@@ -14,6 +12,7 @@ export class ColumnMultiplied implements ColumnMapper<number> {
   public readonly kind = 'multiplied'
 
   constructor (
+    public readonly name: string,
     public readonly factor: number
   ) {}
 
@@ -77,8 +76,9 @@ abstract class ColumnDated implements ColumnMapper<Date> {
   abstract kind: ResultType
 
   constructor (
+    public readonly name: string,
     private readonly dateSetter: (toSet: Date, value: number) => void,
-    private readonly offset: Date
+    public readonly offset: Date
   ) {}
 
   forRow (value: string): Date {
@@ -111,21 +111,25 @@ abstract class ColumnDated implements ColumnMapper<Date> {
 export class ColumnDatedDays extends ColumnDated {
   public readonly kind = 'date/days'
 
-  constructor (offset: Date) {
-    super((toSet: Date, value: number) => toSet.setDate(value), offset)
+  constructor (name: string, offset: Date) {
+    super(name, (toSet: Date, value: number) => toSet.setDate(value), offset)
   }
 }
 
 export class ColumnDatedYears extends ColumnDated {
   public readonly kind = 'date/years'
 
-  constructor (offset: Date) {
-    super((toSet: Date, value: number) => toSet.setFullYear(offset.getFullYear() + value), offset)
+  constructor (name: string, offset: Date) {
+    super(name, (toSet: Date, value: number) => toSet.setFullYear(offset.getFullYear() + value), offset)
   }
 }
 
 export class ColumnRaw implements ColumnMapper<string> {
   public readonly kind = 'raw'
+
+  constructor (
+    public readonly name: string
+  ) {}
 
   forRow (value: string): string {
     return value

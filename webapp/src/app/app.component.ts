@@ -42,13 +42,18 @@ export class AppComponent {
     const typesCSV = this.getAndParseCSV(datasetTypesURL)
     const datasetCSV = this.getAndParseCSV(datasetURL)
 
+    const header = (await datasetCSV).get(0)
+    if (header === undefined) {
+      throw new Error("dataset doesn't have any row")
+    }
+
     const typesStr = (await typesCSV).get(0)
     if ((await typesCSV).size !== 1 || typesStr === undefined) {
       throw new Error("dataset's types should contain a single line")
     }
-    const types = typesStr.map(t => {
+    const types = typesStr.zip(header).map(([t, name]) => {
       switch (t) {
-        case 'string': return new ColumnRaw()
+        case 'string': return new ColumnRaw(name)
       }
 
       const numericMatches = t.match(/^\*(\d+)$/)
@@ -57,7 +62,7 @@ export class AppComponent {
         if (Number.isNaN(value)) {
           throw new Error(`unable to parse as int: ${numericMatches[1]}`)
         }
-        return new ColumnMultiplied(value)
+        return new ColumnMultiplied(name, value)
       }
 
       const dateMatches = t.match(/^date\/(years|days)\+(\d+)$/)
@@ -68,18 +73,13 @@ export class AppComponent {
         }
         const date = new Date(value, 0)
         switch (dateMatches[1]) {
-          case 'years': return new ColumnDatedYears(date)
-          case 'days': return new ColumnDatedDays(date)
+          case 'years': return new ColumnDatedYears(name, date)
+          case 'days': return new ColumnDatedDays(name, date)
         }
       }
 
       throw new Error(`unknown dataset's type: ${t}`)
     })
-
-    const header = (await datasetCSV).get(0)
-    if (header === undefined) {
-      throw new Error("dataset doesn't have any row")
-    }
 
     const content = (await datasetCSV).shift()
     return new Table(types, header, content)

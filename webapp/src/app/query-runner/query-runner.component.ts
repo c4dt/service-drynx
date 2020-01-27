@@ -15,7 +15,7 @@ import { ColumnType, Columns, OperationType, ResultType, Operation, Result } fro
   templateUrl: './query-runner.component.html'
 })
 export class QueryRunnerComponent implements OnChanges {
-  public state: ['nothing-ran'] | ['loading'] | ['loaded', List<[ResultType, Result]>] | ['errored', Error]
+  public state: ['nothing-ran'] | ['loading'] | ['loaded', Columns, List<[ResultType, Result]>] | ['errored', Error]
 
   @Input() public columns: List<[ColumnType, ColumnID]> | null | undefined
 
@@ -57,7 +57,7 @@ export class QueryRunnerComponent implements OnChanges {
     if (value === undefined) {
       return undefined
     }
-    return List(value)
+    return List(value).sortBy(v => (v as any)[1]) as any
   }
 
   private getOperationValue (): OperationType | undefined {
@@ -80,7 +80,7 @@ export class QueryRunnerComponent implements OnChanges {
     }
   }
 
-  buildQuery (): [Operation, SurveyQuery] | undefined {
+  buildQuery (): [Columns, Operation, SurveyQuery] | undefined {
     const operationValue = this.getOperationValue()
     const columnsValue = this.getColumnsValue()
     if (operationValue === undefined || columnsValue === undefined) {
@@ -104,6 +104,7 @@ export class QueryRunnerComponent implements OnChanges {
     }
 
     return [
+      columns,
       operation,
       new SurveyQuery({
         surveyid: 'test-query',
@@ -112,8 +113,7 @@ export class QueryRunnerComponent implements OnChanges {
           operation: new DrynxOperation({
             nameop: operationValue === 'linear regression' ? 'lin_reg' : operationValue,
             // TODO only for linear regression for two rows
-            nbrinput: operationValue === 'linear regression' ? 2 : 1,
-            //nbroutput: operationValue === 'linear regression' ? 5 : undefined,
+            nbrinput: operationValue === 'linear regression' ? 2 : 1
           })
         }),
         rosterservers: new cothority.network.Roster({ list: ids }),
@@ -133,11 +133,7 @@ export class QueryRunnerComponent implements OnChanges {
     return val
   }
 
-  extractSecond<T> (t: [any, T]): T {
-    return t[1]
-  }
-
-  async runQuery ([operation, query]: [Operation, SurveyQuery]): Promise<void> {
+  async runQuery ([columns, operation, query]: [Columns, Operation, SurveyQuery]): Promise<void> {
     this.state = ['loading']
 
     if (query.query === undefined) {
@@ -153,7 +149,7 @@ export class QueryRunnerComponent implements OnChanges {
       if (results === undefined) {
         throw new Error('undefined operation')
       }
-      this.state = ['loaded', results]
+      this.state = ['loaded', columns, results]
     } catch (e) {
       const error = (e instanceof Error) ? e : new Error(e)
       this.state = ['errored', error]

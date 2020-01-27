@@ -15,5 +15,5 @@
 	</ng-container>
 </ng-container>
 <ng-container *ngIf="results !== undefined && results !== null && results.size > 1">
-	<plotly-plot [data]="graph"></plotly-plot>
+	<plotly-plot [data]="graph" [useResizeHandler]="true" [style]="{width: '100%', height: '100%'}"></plotly-plot>
 </ng-container>
