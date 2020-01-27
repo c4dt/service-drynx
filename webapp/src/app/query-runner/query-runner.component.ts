@@ -15,7 +15,7 @@ import { ColumnType, Columns, OperationType, ResultType, Operation, Result } fro
   templateUrl: './query-runner.component.html'
 })
 export class QueryRunnerComponent implements OnChanges {
-  public state: ['nothing-ran'] | ['loading'] | ['loaded', Columns, List<[ResultType, Result]>] | ['errored', Error]
+  public state: ['nothing-ran'] | ['loading'] | ['loaded', string, Columns, List<[ResultType, Result]>] | ['errored', Error]
 
   @Input() public columns: List<[ColumnType, ColumnID]> | null | undefined
 
@@ -145,11 +145,12 @@ export class QueryRunnerComponent implements OnChanges {
 
     try {
       const rawResults = await this.client.run(query)
+      const label = `${query.query.operation.nameop} of ${columns.items.map(c => c.name).join()}:`
       const results = operation.formatResults(rawResults)
       if (results === undefined) {
         throw new Error('undefined operation')
       }
-      this.state = ['loaded', columns, results]
+      this.state = ['loaded', label, columns, results]
     } catch (e) {
       const error = (e instanceof Error) ? e : new Error(e)
       this.state = ['errored', error]

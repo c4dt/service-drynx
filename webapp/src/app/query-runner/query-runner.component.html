@@ -35,7 +35,7 @@
 			Error: {{state[1].message}}
 		</ng-container>
 		<ng-container *ngIf="state[0] === 'loaded'">
-			<app-results-plotter [columns]="state[1]" [results]="state[2]"></app-results-plotter>
+			<app-results-plotter [label]="state[1]" [columns]="state[2]" [results]="state[3]"></app-results-plotter>
 		</ng-container>
 	</mat-grid-tile>
 </mat-grid-list>

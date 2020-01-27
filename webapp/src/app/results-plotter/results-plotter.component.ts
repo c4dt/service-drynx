@@ -8,6 +8,7 @@ import { Result, ResultType, Columns, ColumnMultiplied, ColumnDatedYears, Column
   templateUrl: './results-plotter.component.html'
 })
 export class ResultsPlotterComponent implements OnChanges {
+  @Input() public label: string | null | undefined
   @Input() public results: List<[ResultType, Result]> | null | undefined
   @Input() public columns: Columns | null | undefined
 
