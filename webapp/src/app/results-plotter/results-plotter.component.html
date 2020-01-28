@@ -1,5 +1,7 @@
+<div style="height: 100%">
 <ng-container *ngIf="results !== undefined && results !== null && results.size === 1">
-	{{ label }}
+	<div style="height: 100px"></div>
+	<h2>{{ label }}
 	<ng-container *ngFor="let result of results">
 		<ng-container *ngIf="result[0] === 'number'">
 			{{result[1] | number}}
@@ -14,7 +16,9 @@
 			{{result[1]}}
 		</ng-container>
 	</ng-container>
+	</h2>
 </ng-container>
 <ng-container *ngIf="results !== undefined && results !== null && results.size > 1">
-	<plotly-plot [data]="graph" [useResizeHandler]="true" [style]="{width: '100%', height: '100%'}"></plotly-plot>
+	<plotly-plot [data]="graph" [useResizeHandler]="false"></plotly-plot>
 </ng-container>
+</div>

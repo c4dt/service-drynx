@@ -58,11 +58,6 @@ export class ResultsPlotterComponent implements OnChanges {
     const xPoints = columnMapper(this.range, rawColumnX)
     const yPoints = columnMapper(this.range.map(x => a * x + b), rawColumnY)
 
-    /*
-    const xPoints = this.range
-    const yPoints = xPoints.map(x => a * x + b)
-    */
-
     this.graph = {
       data: [{
         x: xPoints.toArray(),
@@ -71,9 +66,15 @@ export class ResultsPlotterComponent implements OnChanges {
         mode: 'lines'
       }],
       layout: {
-        autosize: true,
-        xaxis: { title: rawColumnX.name },
+        autosize: false,
+        width: 500,
+        height: 300,
+        xaxis: {
+          automargin: true,
+          title: rawColumnX.name
+        },
         yaxis: {
+          automargin: true,
           title: rawColumnY.name,
           range: [0, columnMapper(Seq([10]), rawColumnY).get(0)]
         }

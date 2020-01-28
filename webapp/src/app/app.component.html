@@ -4,6 +4,7 @@
 		<app-dataprovider-viewer style="height: 100%; width: 100%; margin-top: 100px" [table]="dataset | async"></app-dataprovider-viewer>
 	</mat-grid-tile>
 	<mat-grid-tile>
-		<app-query-runner style="width: 100%" [columns]="columns | async"></app-query-runner>
+		<app-query-runner style="width: 100%; height: 100%;"
+						  [columns]="columns | async"></app-query-runner>
 	</mat-grid-tile>
 </mat-grid-list>

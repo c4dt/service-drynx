@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { ReactiveFormsModule } from '@angular/forms'
-import { MatButtonModule, MatListModule, MatGridListModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatTableModule } from '@angular/material'
+import { MatButtonModule, MatListModule, MatGridListModule, MatFormFieldModule, MatOptionModule, MatSelectModule, MatTableModule, MatTabsModule } from '@angular/material'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 
@@ -29,14 +29,15 @@ PlotlyViaCDNModule.plotlyVersion = 'latest'
     ReactiveFormsModule,
     ScrollingModule,
 
+    MatButtonModule,
     MatFormFieldModule,
     MatGridListModule,
-    MatButtonModule,
     MatListModule,
     MatOptionModule,
     MatProgressBarModule,
     MatSelectModule,
     MatTableModule,
+    MatTabsModule,
 
     PlotlyViaCDNModule
   ],

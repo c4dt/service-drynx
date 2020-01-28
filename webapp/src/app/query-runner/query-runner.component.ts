@@ -22,6 +22,7 @@ export class QueryRunnerComponent implements OnChanges {
   // TODO take it from columns.ts
   public readonly allOperations = ['sum', 'mean', 'variance', 'standard deviation', 'linear regression']
   public operations: List<OperationType>
+  public tabIndex = 0;
 
   public readonly queryBuilder = new FormGroup({
     columns: new FormControl(undefined, Validators.required),
@@ -144,8 +145,9 @@ export class QueryRunnerComponent implements OnChanges {
     }
 
     try {
+      this.tabIndex = 1
       const rawResults = await this.client.run(query)
-      const label = `${query.query.operation.nameop} of ${columns.items.map(c => c.name).join()}:`
+      const label = `The ${query.query.operation.nameop} of ${columns.items.map(c => c.name).join()} is:`
       const results = operation.formatResults(rawResults)
       if (results === undefined) {
         throw new Error('undefined operation')

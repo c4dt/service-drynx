@@ -1,5 +1,6 @@
-<mat-grid-list cols="2">
-	<mat-grid-tile>
+<mat-tab-group [(selectedIndex)]="tabIndex">
+	<mat-tab label="query">
+		<div style="height: 100px"></div>
 		<form [formGroup]="queryBuilder" (ngSubmit)="runQuery(throwOnUndefined(buildQuery()))">
 			<mat-list>
 				<mat-list-item><mat-form-field>
@@ -25,17 +26,20 @@
 				</button></mat-list-item>
 			</mat-list>
 		</form>
-	</mat-grid-tile>
+	</mat-tab>
 
-	<mat-grid-tile>
+	<mat-tab label="result">
 		<ng-container *ngIf="state[0] === 'loading'">
+			<div style="height: 100px"></div>
 			<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 		</ng-container>
 		<ng-container *ngIf="state[0] === 'errored'">
+			<div style="height: 100px"></div>
 			Error: {{state[1].message}}
 		</ng-container>
 		<ng-container *ngIf="state[0] === 'loaded'">
-			<app-results-plotter [label]="state[1]" [columns]="state[2]" [results]="state[3]"></app-results-plotter>
+			<app-results-plotter [label]="state[1]" [columns]="state[2]" [results]="state[3]"
+			style="height:100%;"></app-results-plotter>
 		</ng-container>
-	</mat-grid-tile>
-</mat-grid-list>
+	</mat-tab>
+</mat-tab-group>
