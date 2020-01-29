@@ -200,7 +200,7 @@ export class Columns {
         default:
           throw new Error()
       }
-    } else if (items.size === 2) {
+    } else if (items.size === 2 || items.size === 3) {
       // TODO verify columns compatibility
       this.validOperations = List.of(new Operation('linear regression', this.items))
     } else {

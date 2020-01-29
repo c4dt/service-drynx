@@ -1,7 +1,10 @@
-import { List, Range, Seq } from 'immutable'
+import { List, Range, Seq, Repeat, Collection } from 'immutable'
 
 import { Component, Input, OnChanges } from '@angular/core'
 import { Result, ResultType, Columns, ColumnMultiplied, ColumnDatedYears, ColumnType } from '../columns'
+
+type Point = Collection.Indexed<number>
+type Points = Collection.Indexed<Point>
 
 @Component({
   selector: 'app-results-plotter',
@@ -26,59 +29,111 @@ export class ResultsPlotterComponent implements OnChanges {
       return // do not update graph
     }
 
-    if (this.results.size !== 2 || this.columns.items.size !== 2) {
-      throw new Error("don't know how to do those yet")
-    }
-
-    const rawA = this.results.get(1)
-    const rawB = this.results.get(0)
-    const rawColumnX = this.columns.items.get(0)
-    const rawColumnY = this.columns.items.get(1)
-    if (rawA === undefined || rawA[0] !== 'number' ||
-      rawB === undefined || rawB[0] !== 'number' ||
-      rawColumnX === undefined || rawColumnY === undefined) {
+    if (this.results.size !== this.columns.items.size || this.results.size > 3) {
       throw new Error()
     }
 
-    const a = rawA[1] as number
-    const b = rawB[1] as number
+    if (this.results.some(([t, _]) => t !== 'number')) {
+      throw new Error()
+    }
+    const resultsNumbers = this.results.map(([_, r]) => r as number)
 
-    const columnMapper = function (points: Seq.Indexed<number>, column: ColumnType): Seq.Indexed<number> {
+    const ranges = Repeat(this.range, this.results.size - 1)
+    const inputs = ranges
+      .reduce((acc, val) => val.flatMap(i => acc.map(l => Seq([...l, i]))), Seq([Seq([1])]))
+
+    inputs.forEach(v => console.log(v.toArray()))
+
+    const computed = inputs.map(ins => ins
+      .zip(resultsNumbers)
+      .map(([l, r]) => l * r)
+      .reduce((acc, val) => acc + val, 0)
+    )
+
+    const columnMapper = function<T> (points: Collection<T, number>, column: ColumnType): Collection<T, number> {
+      return points.map(v => scaler(v, column))
+    }
+
+    const scaler = function (value: number, column: ColumnType): number {
       if (column instanceof ColumnMultiplied) {
-        return points.map(p => p * column.factor)
+        return value * column.factor
       }
 
       if (column instanceof ColumnDatedYears) {
-        return points.map(p => p + column.offset.getFullYear())
+        return value + column.offset.getFullYear()
       }
 
       throw new Error()
     }
 
-    const xPoints = columnMapper(this.range, rawColumnX)
-    const yPoints = columnMapper(this.range.map(x => a * x + b), rawColumnY)
+    console.log('==')
+    computed.forEach(v => console.log(v))
 
-    this.graph = {
-      data: [{
-        x: xPoints.toArray(),
-        y: yPoints.toArray(),
-        type: 'scatter',
-        mode: 'lines'
-      }],
-      layout: {
+    const points = inputs
+      .map(l => l.rest())
+      .zip(computed).map(([l, n]) => List.of(...l, n))
+
+    const scaledPoints = this.scalePoints(points, this.columns)
+
+    const data = this.pointsToObject(scaledPoints)
+
+    const layout = this.columns.items
+      .zip(List.of('x', 'y', 'z'))
+      .reduce((acc, [col, n]) => {
+        acc[`${n}axis`] = {
+          title: col.name,
+          range: [columnMapper(Seq([0]), col).first(), columnMapper(Seq([10]), col).first()]
+        }
+        return acc
+      }, {
         autosize: false,
         width: 500,
-        height: 300,
-        xaxis: {
-          automargin: true,
-          title: rawColumnX.name
-        },
-        yaxis: {
-          automargin: true,
-          title: rawColumnY.name,
-          range: [0, columnMapper(Seq([10]), rawColumnY).get(0)]
-        }
-      }
+        height: 300
+      } as any)
+
+    this.graph = {
+      data: [data],
+      layout: layout
     }
+  }
+
+  private pointsToObject (points: Points): any {
+    if (this.results === undefined || this.results === null) {
+      throw new Error()
+    }
+
+    const keyes = List.of('x', 'y', 'z')
+    return points
+      .reduce((acc, input) => {
+        keyes.zip(input).forEach(([key, i]) => {
+          if (!(key in acc)) {
+            acc[key] = []
+          }
+          acc[key].push(i)
+        })
+        return acc
+      }, {
+        type: this.results.size === 2 ? 'scatter' : 'mesh3d',
+        mode: 'lines'
+      } as any)
+  }
+
+  private scalePoints (points: Points, columns: Columns): Points {
+    const scaler = function (column: ColumnType, value: number): number {
+      if (column instanceof ColumnMultiplied) {
+        return value * column.factor
+      }
+
+      if (column instanceof ColumnDatedYears) {
+        return value + column.offset.getFullYear()
+      }
+
+      throw new Error()
+    }
+
+    return points
+      .map(point => columns.items
+        .zip(point)
+        .map(([col, value]) => scaler(col, value)))
   }
 }

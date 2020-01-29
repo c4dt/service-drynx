@@ -54,11 +54,11 @@ export class QueryRunnerComponent implements OnChanges {
   }
 
   private getColumnsValue (): List<[ColumnType, ColumnID]> | undefined {
-    const value = this.getFormValue('columns')
+    const value: Array<[ColumnType, ColumnID]> | undefined = this.getFormValue('columns')
     if (value === undefined) {
       return undefined
     }
-    return List(value).sortBy(v => (v as any)[1]) as any
+    return List(value).sortBy(v => v[1])
   }
 
   private getOperationValue (): OperationType | undefined {
@@ -114,7 +114,7 @@ export class QueryRunnerComponent implements OnChanges {
           operation: new DrynxOperation({
             nameop: operationValue === 'linear regression' ? 'lin_reg' : operationValue,
             // TODO only for linear regression for two rows
-            nbrinput: operationValue === 'linear regression' ? 2 : 1
+            nbrinput: operationValue === 'linear regression' ? columns.items.size : 1
           })
         }),
         rosterservers: new cothority.network.Roster({ list: ids }),
