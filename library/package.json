@@ -22,8 +22,8 @@
 	},
 	"homepage": "https://github.com/c4dt/service-drynx/tree/master/library#readme",
 	"dependencies": {
-		"@dedis/cothority": "^3.4.2",
-		"@dedis/kyber": "^3.4.2-p2001.1716.2840.0",
+		"@dedis/cothority": "^3.4.3",
+		"@dedis/kyber": "^3.4.2",
 		"gaussian-elimination": "^1.0.2",
 		"immutable": "^4.0.0-rc.12",
 		"protobufjs": "^6.8.8",
@@ -31,11 +31,11 @@
 	},
 	"devDependencies": {
 		"@types/concat-stream": "^1.6.0",
-		"@types/jasmine": "^3.5.0",
-		"@types/node": "^12.12.24",
+		"@types/jasmine": "^3.5.2",
+		"@types/node": "^12.12.26",
 		"@types/ws": "^6.0.4",
-		"@typescript-eslint/eslint-plugin": "^2.15.0",
-		"@typescript-eslint/parser": "^2.15.0",
+		"@typescript-eslint/eslint-plugin": "^2.18.0",
+		"@typescript-eslint/parser": "^2.18.0",
 		"concat-stream": "^2.0.0",
 		"eslint": "^6.8.0",
 		"eslint-config-standard-with-typescript": "^11.0.1",
@@ -46,7 +46,7 @@
 		"jasmine": "^3.5.0",
 		"jasmine-ts-console-reporter": "^3.1.1",
 		"standard": "^14.3.1",
-		"ts-node": "^8.5.2",
-		"typescript": "^3.7.4"
+		"ts-node": "^8.6.2",
+		"typescript": "^3.7.5"
 	}
 }
