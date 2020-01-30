@@ -12,6 +12,7 @@ import { DataproviderViewerComponent } from './dataprovider-viewer/dataprovider-
 
 // TODO CDN because of plotly/plotly.js#3518
 import { PlotlyViaCDNModule } from 'angular-plotly.js'
+import { OmniledgerLoginModule } from './omniledger-login/omniledger-login.module'
 import { ResultsPlotterComponent } from './results-plotter/results-plotter.component'
 
 PlotlyViaCDNModule.plotlyVersion = 'latest'
@@ -39,7 +40,9 @@ PlotlyViaCDNModule.plotlyVersion = 'latest'
     MatTableModule,
     MatTabsModule,
 
-    PlotlyViaCDNModule
+    PlotlyViaCDNModule,
+
+    OmniledgerLoginModule
   ],
   providers: [],
   bootstrap: [AppComponent]

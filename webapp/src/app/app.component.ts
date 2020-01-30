@@ -4,6 +4,7 @@ import { Component } from '@angular/core'
 import * as csv from 'papaparse'
 
 import { ColumnID } from '@c4dt/drynx'
+import { InstanceID } from '@dedis/cothority/byzcoin'
 
 import { ConfigService } from './config.service'
 import { ColumnType, ColumnMultiplied, ColumnDatedYears, ColumnDatedDays, ColumnRaw } from './columns'
@@ -17,11 +18,14 @@ export class AppComponent {
   public datasets: List<Promise<Table>>
   public columns: Promise<List<[ColumnType, ColumnID]>>
 
+  public readonly darc: InstanceID
+
   constructor (
-    private readonly config: ConfigService
+    config: ConfigService
   ) {
-    this.datasets = List(this.config.DataProviders.map(async dp => AppComponent.fetchDataset(dp.datasetURL, dp.datasetTypesURL)))
+    this.datasets = List(config.DataProviders.map(async dp => AppComponent.fetchDataset(dp.datasetURL, dp.datasetTypesURL)))
     this.columns = Promise.all(this.datasets).then(ret => AppComponent.getRelevantColumns(List(ret)))
+    this.darc = config.ByzCoin.LoginDarc
   }
 
   private static async getAndParseCSV (url: URL): Promise<List<List<string>>> {

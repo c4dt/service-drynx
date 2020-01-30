@@ -12,6 +12,12 @@ export class ConfigService {
   public readonly ClientURL = new URL('ws://demo.c4dt.org/drynx/node')
   public readonly TotalRowCount = 30
 
+  public readonly ByzCoin = {
+    ID: Buffer.from('9cc36071ccb902a1de7e0d21a2c176d73894b1cf88ae4cc2ba4c95cd76f474f3', 'hex'),
+    URL: new URL('wss://conode.c4dt.org:7771'),
+    LoginDarc: Buffer.from('4be97c0dead93e02079d5ba9e4c12078cc81f2b522d16512ed3eaeef3f3db4e8', 'hex')
+  }
+
   public readonly DataProviders = [{
     datasetURL: new URL(`${datasetBaseURL}/1`),
     datasetTypesURL: new URL(`${datasetBaseURL}/1_types`),

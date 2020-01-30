@@ -23,6 +23,7 @@
     "@angular/platform-browser-dynamic": "~8.2.14",
     "@angular/router": "~8.2.14",
     "@c4dt/drynx": "file:../library",
+    "@c4dt/dynacred": "^0.3.3-p20200206075108.0",
     "@dedis/cothority": "^3.4.3",
     "@dedis/kyber": "^3.4.2",
     "angular-plotly.js": "^1.5.0",
@@ -33,8 +34,8 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.803.23",
-    "@angular/cli": "~8.3.23",
+    "@angular-devkit/build-angular": "^0.803.25",
+    "@angular/cli": "~8.3.25",
     "@angular/compiler-cli": "~8.2.14",
     "@angular/language-service": "~8.2.14",
     "@types/jasmine": "~3.3.8",
