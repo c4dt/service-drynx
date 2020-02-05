@@ -1,19 +1,13 @@
+import assert from 'assert'
+import { randomBytes } from 'crypto'
+
 import { BN256G1Point } from '@dedis/kyber/pairing/point'
 import BN256Scalar from '@dedis/kyber/pairing/scalar'
-// @ts-ignore
-import { randomBytes } from 'crypto-browserify'
 import { PointFactory, Point, Scalar } from '@dedis/kyber'
 
 import * as Suite from './suite'
 import { CipherText } from './conv'
 import { Map } from 'immutable'
-
-// TODO can't resolve Node's assert when used in webapp
-function assert (cond: boolean): void {
-  if (!cond) {
-    throw new Error('assertion failed')
-  }
-}
 
 /**
  * Holds a keypair of a scalar/point pair, where the point is the scalar * Base,

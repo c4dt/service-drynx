@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { List } from 'immutable'
 import gauss from 'gaussian-elimination'
 
