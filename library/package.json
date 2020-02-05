@@ -3,9 +3,6 @@
 	"version": "0.0.0",
 	"description": "TypeScript interface to Drynx",
 	"main": "build/index.js",
-	"browser": {
-		"ws": false
-	},
 	"scripts": {
 		"build": "tsc",
 		"lint": "eslint --ext .ts src spec",

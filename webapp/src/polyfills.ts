@@ -60,8 +60,3 @@ import 'zone.js/dist/zone' // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
-import { Buffer } from 'buffer'
-(window as any).Buffer = Buffer;
-
-(window as any).global = { crypto: window.crypto };
-(window as any).process = { browser: true }
