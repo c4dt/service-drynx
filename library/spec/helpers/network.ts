@@ -4,8 +4,6 @@ import { createConnection } from 'net'
 import * as cothority from '@dedis/cothority'
 import kyber from '@dedis/kyber'
 
-import concat from 'concat-stream'
-
 const hostname = 'localhost'
 const nodeCount = 3
 
@@ -75,7 +73,9 @@ async function startNode (portServer: number, portClient: number): Promise<Node>
 
   const conf: Promise<Buffer> = new Promise((resolve, reject) => {
     gen.on('error', reject)
-    gen.stdout.pipe(concat(resolve))
+    let acc = Buffer.alloc(0)
+    gen.stdout.on('data', chunk => { acc = Buffer.concat([acc, chunk]) })
+    gen.stdout.on('end', () => resolve(acc))
   })
 
   await runUntilEnd(gen)
