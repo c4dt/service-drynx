@@ -9,7 +9,7 @@ const datasetBaseURL = 'https://demo.c4dt.org/drynx/datasets'
   providedIn: 'root'
 })
 export class ConfigService {
-  public readonly ClientURL = new URL('ws://demo.c4dt.org/drynx/node')
+  public readonly ClientURL = new URL('wss://demo.c4dt.org/drynx/node')
   public readonly TotalRowCount = 30
 
   public readonly ByzCoin = {
