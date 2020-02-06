@@ -1,6 +1,6 @@
 import { List, Map } from 'immutable'
 
-import { Input, Component, OnChanges, SimpleChanges } from '@angular/core'
+import { Input, Component, OnChanges } from '@angular/core'
 import { FormControl, FormGroup, Validators, AbstractControl } from '@angular/forms'
 
 import { ColumnID, SurveyQuery, Operation as DrynxOperation, Query, ServerIdentityList } from '@c4dt/drynx'
@@ -65,7 +65,7 @@ export class QueryRunnerComponent implements OnChanges {
     return this.getFormValue('operation')
   }
 
-  ngOnChanges (_?: SimpleChanges): void {
+  ngOnChanges (): void {
     const columnsValue = this.getColumnsValue()
     if (columnsValue === undefined) {
       return

@@ -38,8 +38,7 @@
 			Error: {{state[1].message}}
 		</ng-container>
 		<ng-container *ngIf="state[0] === 'loaded'">
-			<app-results-plotter [label]="state[1]" [columns]="state[2]" [results]="state[3]"
-			style="height:100%;"></app-results-plotter>
+			<app-results-plotter [label]="state[1]" [columns]="state[2]" [results]="state[3]" style="height:100%;"></app-results-plotter>
 		</ng-container>
 	</mat-tab>
 </mat-tab-group>

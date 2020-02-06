@@ -92,7 +92,7 @@ abstract class ColumnDated implements ColumnMapper<Date> {
     return ret
   }
 
-  forResults (_2: OperationType, results: List<number>): [ResultType, Date] {
+  forResults (_: any, results: List<number>): [ResultType, Date] {
     const date = results.get(0)
     if (date === undefined) {
       throw new Error('weird shape for a date')
@@ -135,7 +135,7 @@ export class ColumnRaw implements ColumnMapper<string> {
     return value
   }
 
-  forResults (_2: OperationType, _3: List<number>): undefined {
+  forResults (): undefined {
     return undefined
   }
 

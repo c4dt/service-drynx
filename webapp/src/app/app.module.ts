@@ -10,10 +10,11 @@ import { QueryRunnerComponent } from './query-runner/query-runner.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { DataproviderViewerComponent } from './dataprovider-viewer/dataprovider-viewer.component'
 
-// TODO CDN because of plotly/plotly.js#3518
-import { PlotlyViaCDNModule } from 'angular-plotly.js'
 import { OmniledgerLoginModule } from './omniledger-login/omniledger-login.module'
 import { ResultsPlotterComponent } from './results-plotter/results-plotter.component'
+// TODO CDN because of plotly/plotly.js#3518
+import { PlotlyViaCDNModule } from 'angular-plotly.js'
+import { VisGraph3DDirective } from './results-plotter/vis-graph.directive'
 
 PlotlyViaCDNModule.plotlyVersion = 'latest'
 
@@ -22,7 +23,8 @@ PlotlyViaCDNModule.plotlyVersion = 'latest'
     AppComponent,
     QueryRunnerComponent,
     DataproviderViewerComponent,
-    ResultsPlotterComponent
+    ResultsPlotterComponent,
+    VisGraph3DDirective
   ],
   imports: [
     BrowserAnimationsModule,
