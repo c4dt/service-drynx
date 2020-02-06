@@ -70,7 +70,7 @@ export class OmniledgerLoginDialog implements OnInit {
 
     const conn = new WebSocketConnection(byzcoinUrl, ByzCoinRPC.serviceName)
     const rpc = await ByzCoinRPC.fromByzcoin(conn, this.config.ByzCoin.ID)
-    const data = await Data.load(rpc, StorageDB)
+    const data = await Data.load(rpc, StorageDB, undefined, false)
     const identity = IdentityWrapper.fromIdentity(data.keyIdentitySigner)
 
     const darc = await this.data.darc
