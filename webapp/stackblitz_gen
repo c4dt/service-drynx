@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+str_to_html() {
+	sed 's,",\&quot;,g'
+}
+
+cat <<-EOF
+<html lang="en">
+<head></head>
+<body>
+
+<form id="mainForm" method="post" action="https://stackblitz.com/run" target="_self">
+EOF
+
+for f in $(git ls-files)
+do
+	[ "$f" = 'src/favicon.ico' -o \
+	"$f" = 'package.json' -o \
+	"$f" = 'package-lock.json' -o \
+	"$f" = 'src/app/main.ts' ] && continue
+	[[ "$f" = src/omniledger-login/* ]] && continue
+
+	cat <<-EOF
+	<input type="hidden" name="project[files][$f]" value="$(
+		sed '/[Oo]mniledger/d' $f |
+		str_to_html
+	)">
+	EOF
+done
+
+cat <<-EOF
+<input type="hidden" name="project[description]" value="drynx">
+<input type="hidden" name="project[dependencies]" value="$(
+	jq --sort-keys '[(.dependencies | to_entries), (.devDependencies | to_entries)] | flatten | from_entries' < package.json |
+		sed 's,"file:\.\./library","dev",' |
+		str_to_html
+)">
+<input type="hidden" name="project[template]" value="angular-cli">
+</form>
+<script>document.getElementById("mainForm").submit();</script>
+
+</body></html>
+EOF

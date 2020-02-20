@@ -7,8 +7,6 @@ services/%: | services
 
 include services/mk/service.mk
 
-$Swebapp-build $Swebapp-test: $Slibrary-build
-
 .PHONY: kubernetes-deploy
 kubernetes-deploy:
 	kubectl delete configmap/datasets || :
@@ -32,6 +30,10 @@ kubernetes-dump-config: kubernetes-deploy
 	echo datasets root: http://`get_host drynx-http-datasets drynx-datasets`; \
 	echo client: ws://`get_host drynx-node-$$(ls kubernetes/datasets | sort | head -n1) drynx`
 	@kubectl get pods | awk '/drynx-node/ {print $$1}' | xargs -I{} kubectl exec {} -- sh -c 'echo address: tcp://`ip addr list dev eth0 | awk -F "[/ ]+" "/inet/ {print \\$$3}"`:1234; echo public: `awk -F \" "/Public/ {print \\$$2}" /config/config`'
+
+$Dwebapp/dist/stackblitz:
+	mkdir -p $webapp/dist
+	cd webapp && ./stackblitz_gen > dist/stackblitz
 
 ifneq ($S,)
 all: $Sall

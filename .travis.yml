@@ -4,7 +4,11 @@ node_js: node
 addons:
   ssh_known_hosts: c4dtsrv1.epfl.ch
 
-script: make library-build library-test webapp-build
+install:
+  - curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
+  - chmod +x jq
+  - export PATH=$PATH:$PWD
+script: make library-build library-test webapp-build webapp/dist/stackblitz
 
 before_deploy:
   - echo "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_rsa"
