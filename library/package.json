@@ -2,7 +2,11 @@
 	"name": "@c4dt/drynx",
 	"version": "0.0.0",
 	"description": "TypeScript interface to Drynx",
+	"publishConfig": {
+		"access": "public"
+	},
 	"main": "build/index.js",
+	"types": "build/index.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"lint": "eslint --ext .ts src spec",

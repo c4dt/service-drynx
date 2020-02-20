@@ -4,14 +4,16 @@ node_js: node
 addons:
   ssh_known_hosts: c4dtsrv1.epfl.ch
 
-script: make library-test webapp-build
+script: make library-build library-test webapp-build
 
 before_deploy:
   - echo "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_rsa"
   - chmod 600 "$HOME/.ssh/id_rsa"
+  - echo "//registry.npmjs.org/:_authToken=${DEPLOY_NPM_TOKEN}" > "$HOME/.npmrc"
 deploy:
-  skip_cleanup: true
-  provider: script
-  script: rsync -a --del webapp/dist/ drynx@c4dtsrv1.epfl.ch:www
-  on:
-    branch: master
+  - provider: script
+    script: rsync -a --del webapp/dist/ drynx@c4dtsrv1.epfl.ch:www
+    skip_cleanup: true
+  - provider: script
+    script: cd library && npm version prerelease --preid=p`date +%Y%m%d%H%M%S` && npm publish --tag dev
+    skip_cleanup: true
