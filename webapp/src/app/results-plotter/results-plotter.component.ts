@@ -36,9 +36,18 @@ export class ResultsPlotterComponent implements OnChanges {
       return // do not update graph
     }
 
+    const columns = this.columns
+
     const factors = this.results.map(([_, r]) => r as number)
     const points = this.interpolateFunction(factors)
-    const scalled = ResultsPlotterComponent.scalePoints(this.columns, points)
+    const scalled = ResultsPlotterComponent.scalePoints(columns, points)
+    const ranges: [Point, Point] = [
+      scalled.reduce((acc, p) => acc.zip(p).map(([x, y]) => x < y ? x : y)
+        .zip(columns.items)
+        .map(([n, col]) => col.kind === 'multiplied' ? 0 : n)),
+      scalled.reduce((acc, p) => acc.zip(p).map(([x, y]) => x > y ? x : y))
+    ]
+
     if (this.results.size === 2) {
       this.plotlyGraph = {
         data: [scalled
@@ -56,7 +65,7 @@ export class ResultsPlotterComponent implements OnChanges {
             type: 'scatter',
             mode: 'lines'
           } as any)],
-        layout: this.gen2DOptions(this.columns)
+        layout: this.gen2DOptions(this.columns, ranges)
       }
     } else if (this.results.size === 3) {
       this.visGraphData = ResultsPlotterComponent.pointsToDataSet(scalled)
@@ -65,7 +74,7 @@ export class ResultsPlotterComponent implements OnChanges {
   }
 
   private interpolateFunction (factors: List<number>): Seq.Indexed<Point> {
-    const offset: number = factors.last(0)
+    const offset: number = factors.first(0)
     const ranges = Repeat(this.range, factors.size - 1)
     const inputs = ranges
       .reduce((acc, range) =>
@@ -130,14 +139,18 @@ export class ResultsPlotterComponent implements OnChanges {
     return [container.offsetWidth, container.offsetHeight]
   }
 
-  private gen2DOptions (columns: Columns): any {
+  private gen2DOptions (columns: Columns, ranges: [Point, Point]): any {
     const [width, height] = ResultsPlotterComponent.getMaximumWidth()
     const columnsName: List<string> = columns.items.map(col => col.name)
 
     return columnsName
       .zip(List.of('x', 'y', 'z'))
-      .reduce((acc, [col, n]) => {
-        acc[`${n}axis`] = { title: col }
+      .zip(ranges[0].zip(ranges[1]))
+      .reduce((acc, [[col, n], [min, max]]) => {
+        acc[`${n}axis`] = {
+          title: col,
+          range: [min, max]
+        }
         return acc
       }, {
         autosize: false,
