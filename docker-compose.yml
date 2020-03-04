@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  data-provider:
+    image: c4dt/drynx:latest
+    network_mode: host
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/data-provider"]
+    volumes:
+      - ./datasets:/datasets
+      - ./configs:/configs
+  computing-node:
+    image: c4dt/drynx:latest
+    network_mode: host
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/computing-node"]
+    volumes:
+      - ./configs:/configs
+  http-datasets:
+    image: nginx:latest
+    ports:
+      - 8080:80
+    entrypoint: ["/bin/sh", "-c", "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'"]
+    volumes:
+      - ./datasets:/usr/share/nginx/html
