@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { List } from 'immutable'
 import gauss from 'gaussian-elimination'
 
@@ -30,12 +29,15 @@ export class Client {
     this.keys = keys
   }
 
-  async run (sq: SurveyQuery): Promise<List<number>> {
+  async run (sq: SurveyQuery): Promise<{raw: List<number>, computed: List<number> | undefined}> {
     if (sq.query === undefined) {
       throw new Error('no query defined')
     }
     if (sq.query.operation === undefined) {
       throw new Error('no operation defined')
+    }
+    if (sq.query.operation.nameop === undefined) {
+      throw new Error('operation not well defined')
     }
 
     const isStdDev = sq.query.operation.nameop === 'standard deviation'
@@ -76,7 +78,14 @@ export class Client {
       return decrypted
     })
 
-    switch (sq.query.operation.nameop) {
+    return {
+      raw: List(results),
+      computed: this.compute(sq.query.operation.nameop, results)
+    }
+  }
+
+  private compute (name: string, results: number[]): List<number> | undefined {
+    switch (name) {
       case 'mean':
         if (results.length !== 2) {
           throw new Error('wrong shape of results')
@@ -91,7 +100,7 @@ export class Client {
         const mean = (results[0] / results[1])
         const variance = results[2] / results[1] - mean * mean
 
-        if (isStdDev) {
+        if (name === 'standard deviation') {
           return List.of(Math.sqrt(variance))
         }
         return List.of(variance)
@@ -135,6 +144,6 @@ export class Client {
       }
     }
 
-    return List(results)
+    return undefined
   }
 }

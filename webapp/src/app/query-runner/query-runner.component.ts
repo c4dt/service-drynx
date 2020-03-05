@@ -147,12 +147,12 @@ export class QueryRunnerComponent implements OnChanges {
 
     try {
       this.tabIndex = 1
-      const rawResults = await this.client.run(query)
-      const label = `The ${query.query.operation.nameop} of ${columns.items.map(c => c.name).join()} is:`
-      const results = operation.formatResults(rawResults)
-      if (results === undefined) {
+      const { computed } = await this.client.run(query)
+      if (computed === undefined) {
         throw new Error('undefined operation')
       }
+      const label = `The ${query.query.operation.nameop} of ${columns.items.map(c => c.name).join()} is:`
+      const results = operation.formatResults(computed)
       this.state = ['loaded', label, columns, results]
     } catch (e) {
       const error = (e instanceof Error) ? e : new Error(e)
