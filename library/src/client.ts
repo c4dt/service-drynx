@@ -81,7 +81,7 @@ export class Client {
         if (results.length !== 2) {
           throw new Error('wrong shape of results')
         }
-        return List.of(Math.trunc(results[0] / results[1]))
+        return List.of(results[0] / results[1])
       case 'standard deviation':
       case 'variance': {
         if (results.length !== 3) {
@@ -92,9 +92,9 @@ export class Client {
         const variance = results[2] / results[1] - mean * mean
 
         if (isStdDev) {
-          return List.of(Math.trunc(Math.sqrt(variance)))
+          return List.of(Math.sqrt(variance))
         }
-        return List.of(Math.trunc(variance))
+        return List.of(variance)
       }
       case 'lin_reg': {
         const d = Math.round((-5 + Math.sqrt(5 * 5 - 4 * (4 - 2 * results.length))) / 2)
