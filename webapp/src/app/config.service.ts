@@ -1,3 +1,4 @@
+import { List } from 'immutable'
 import { Injectable } from '@angular/core'
 
 import * as cothority from '@dedis/cothority'
@@ -9,7 +10,7 @@ const datasetBaseURL = 'https://demo.c4dt.org/drynx/datasets'
   providedIn: 'root'
 })
 export class ConfigService {
-  public readonly ClientURL = new URL('wss://demo.c4dt.org/drynx/node')
+  public readonly ClientURL = new URL('wss://demo.c4dt.org/drynx/leader')
   public readonly TotalRowCount = 30
 
   public readonly ByzCoin = {
@@ -18,7 +19,7 @@ export class ConfigService {
     LoginDarc: Buffer.from('4be97c0dead93e02079d5ba9e4c12078cc81f2b522d16512ed3eaeef3f3db4e8', 'hex')
   }
 
-  public readonly DataProviders = [{
+  public readonly DataProviders = List.of({
     datasetURL: new URL(`${datasetBaseURL}/1`),
     datasetTypesURL: new URL(`${datasetBaseURL}/1_types`),
     identity: new cothority.network.ServerIdentity({
@@ -45,7 +46,12 @@ export class ConfigService {
         kyber.pairing.point.BN256G1Point.MARSHAL_ID,
         Buffer.from('79cca3dac2ed903e324a72d036210a329dfcc4418721687eb0007f5a09777b991bae1916e8ba7602cf0cc09b0ac530371db584545ea09b23101b3d9f59b82e57', 'hex')])
     })
-  }]
+  })
 
-  public readonly ComputingNode = this.DataProviders[0].identity
+  public readonly ComputingNode = new cothority.network.ServerIdentity({
+    address: 'tcp://localhost:4320',
+    public: Buffer.concat([
+      kyber.pairing.point.BN256G1Point.MARSHAL_ID,
+      Buffer.from('08588c22f9758797d2bac23aed6182ad23a1ad5c8be0b1529e300ef07ee132ce55fe3cbdae8d62ecdd23b7ce10fda9e1c294b3094af16c3b874ab0f38245b2b7', 'hex')])
+  })
 }

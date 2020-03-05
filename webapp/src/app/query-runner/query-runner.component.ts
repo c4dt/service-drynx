@@ -96,8 +96,9 @@ export class QueryRunnerComponent implements OnChanges {
       throw new Error()
     }
 
-    const ids = this.config.DataProviders.map(d => d.identity)
-    const actualDPs = ids.slice(1) // TODO
+    const ids = List.of(this.config.ComputingNode)
+      .concat(this.config.DataProviders
+        .map(d => d.identity))
 
     let idToPublic: Map<string, Buffer> = Map()
     for (const n of ids) {
@@ -117,10 +118,10 @@ export class QueryRunnerComponent implements OnChanges {
             nbrinput: operationValue === 'linear regression' ? columns.items.size : 1
           })
         }),
-        rosterservers: new cothority.network.Roster({ list: ids }),
+        rosterservers: new cothority.network.Roster({ list: ids.toArray() }),
         servertodp: {
           [this.config.ComputingNode.address]:
-          new ServerIdentityList({ content: actualDPs })
+          new ServerIdentityList({ content: this.config.DataProviders.map(d => d.identity).toArray() })
         },
         idtopublic: idToPublic.toJSON()
       })
