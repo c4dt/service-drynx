@@ -1,14 +1,14 @@
 import { BrowserModule } from '@angular/platform-browser'
 import { NgModule } from '@angular/core'
 import { ReactiveFormsModule } from '@angular/forms'
-import { MatButtonModule } from '@angular/material/button';
-import { MatOptionModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatListModule } from '@angular/material/list';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatButtonModule } from '@angular/material/button'
+import { MatOptionModule } from '@angular/material/core'
+import { MatFormFieldModule } from '@angular/material/form-field'
+import { MatGridListModule } from '@angular/material/grid-list'
+import { MatListModule } from '@angular/material/list'
+import { MatSelectModule } from '@angular/material/select'
+import { MatTableModule } from '@angular/material/table'
+import { MatTabsModule } from '@angular/material/tabs'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
 import { ScrollingModule } from '@angular/cdk/scrolling'
 
@@ -17,7 +17,6 @@ import { QueryRunnerComponent } from './query-runner/query-runner.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { DataproviderViewerComponent } from './dataprovider-viewer/dataprovider-viewer.component'
 
-import { OmniledgerLoginModule } from './omniledger-login/omniledger-login.module'
 import { ResultsPlotterComponent } from './results-plotter/results-plotter.component'
 // TODO CDN because of plotly/plotly.js#3518
 import { PlotlyViaCDNModule } from 'angular-plotly.js'
@@ -49,9 +48,7 @@ PlotlyViaCDNModule.plotlyVersion = 'latest'
     MatTableModule,
     MatTabsModule,
 
-    PlotlyViaCDNModule,
-
-    OmniledgerLoginModule
+    PlotlyViaCDNModule
   ],
   providers: [],
   bootstrap: [AppComponent]
