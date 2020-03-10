@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { Component, OnInit, Input, Inject } from '@angular/core'
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material'
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { Data, StorageDB } from '@c4dt/dynacred'
 import { ByzCoinRPC, InstanceID } from '@dedis/cothority/byzcoin'
