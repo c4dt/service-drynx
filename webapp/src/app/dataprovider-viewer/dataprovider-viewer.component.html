@@ -1,28 +1,34 @@
-<ng-container *ngIf="table === null || table === undefined">loading dataset...</ng-container>
+<ng-container *ngIf="table === null || table === undefined"
+  >loading dataset...</ng-container
+>
 <ng-container *ngIf="table !== null && table !== undefined">
-	<cdk-virtual-scroll-viewport style="height: 100%" itemSize="1">
-		<mat-table [dataSource]="table.toObject()">
-			<mat-header-row *matHeaderRowDef="table.header.toJS(); sticky: true"></mat-header-row>
-			<mat-row *matRowDef="let row; columns: table.header.toJS()"></mat-row>
+  <cdk-virtual-scroll-viewport style="height: 100%" itemSize="1">
+    <mat-table [dataSource]="table.toObject()">
+      <mat-header-row
+        *matHeaderRowDef="table.header.toJS(); sticky: true"
+      ></mat-header-row>
+      <mat-row *matRowDef="let row; columns: table.header.toJS()"></mat-row>
 
-			<ng-container *ngFor="let col of table.header.toJS()" matColumnDef="{{col}}">
-				<mat-header-cell *matHeaderCellDef> {{col}} </mat-header-cell>
-				<mat-cell *matCellDef="let row">
-					<ng-container *ngIf="row[col][0].kind === 'date/years'">
-						{{row[col][1] | date:'yyyy'}}
-					</ng-container>
-					<ng-container *ngIf="row[col][0].kind === 'date/days'">
-						{{row[col][1] | date}}
-					</ng-container>
-					<ng-container *ngIf="row[col][0].kind === 'multiplied'">
-						{{row[col][1] | number}}
-					</ng-container>
-					<ng-container *ngIf="row[col][0].kind === 'raw'">
-						{{row[col][1]}}
-					</ng-container>
-				</mat-cell>
-			</ng-container>
-
-		</mat-table>
-	</cdk-virtual-scroll-viewport>
+      <ng-container
+        *ngFor="let col of table.header.toJS()"
+        matColumnDef="{{ col }}"
+      >
+        <mat-header-cell *matHeaderCellDef> {{ col }} </mat-header-cell>
+        <mat-cell *matCellDef="let row">
+          <ng-container *ngIf="row[col][0].kind === 'date/years'">
+            {{ row[col][1] | date: "yyyy" }}
+          </ng-container>
+          <ng-container *ngIf="row[col][0].kind === 'date/days'">
+            {{ row[col][1] | date }}
+          </ng-container>
+          <ng-container *ngIf="row[col][0].kind === 'multiplied'">
+            {{ row[col][1] | number }}
+          </ng-container>
+          <ng-container *ngIf="row[col][0].kind === 'raw'">
+            {{ row[col][1] }}
+          </ng-container>
+        </mat-cell>
+      </ng-container>
+    </mat-table>
+  </cdk-virtual-scroll-viewport>
 </ng-container>
