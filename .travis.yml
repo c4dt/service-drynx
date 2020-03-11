@@ -8,6 +8,7 @@ install:
   - curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
   - chmod +x jq
   - export PATH=$PATH:$PWD
+before_script: npm i prettier && npx prettier --check 'webapp/src/**/*.html'
 script: make library-build library-test webapp-build webapp/dist/stackblitz
 
 before_deploy:
