@@ -23,29 +23,30 @@
 	},
 	"homepage": "https://github.com/c4dt/service-drynx/tree/master/library#readme",
 	"dependencies": {
-		"@dedis/cothority": "^3.4.3",
+		"@dedis/cothority": "^3.4.4",
 		"@dedis/kyber": "^3.4.2",
 		"gaussian-elimination": "^1.0.2",
 		"immutable": "^4.0.0-rc.12",
-		"protobufjs": "^6.8.8",
-		"tslib": "^1.10.0"
+		"protobufjs": "^6.8.9",
+		"tslib": "^1.11.1"
 	},
 	"devDependencies": {
-		"@types/jasmine": "^3.5.2",
-		"@types/node": "^12.12.26",
-		"@types/ws": "^6.0.4",
-		"@typescript-eslint/eslint-plugin": "^2.18.0",
-		"@typescript-eslint/parser": "^2.18.0",
+		"@types/jasmine": "^3.5.9",
+		"@types/node": "^13.9.1",
+		"@types/ws": "^7.2.2",
+		"@typescript-eslint/eslint-plugin": "^2.24.0",
+		"@typescript-eslint/parser": "^2.24.0",
 		"eslint": "^6.8.0",
-		"eslint-config-standard-with-typescript": "^11.0.1",
-		"eslint-plugin-import": "^2.20.0",
-		"eslint-plugin-node": "^9.2.0",
+		"eslint-config-standard-with-typescript": "^15.0.0",
+		"eslint-plugin-import": "^2.20.1",
+		"eslint-plugin-node": "^11.0.0",
 		"eslint-plugin-promise": "^4.2.1",
 		"eslint-plugin-standard": "^4.0.1",
 		"jasmine": "^3.5.0",
 		"jasmine-ts-console-reporter": "^3.1.1",
-		"standard": "^14.3.1",
+		"minimist": "^1.2.5",
+		"standard": "^14.3.3",
 		"ts-node": "^8.6.2",
-		"typescript": "^3.7.5"
+		"typescript": "^3.8.3"
 	}
 }
