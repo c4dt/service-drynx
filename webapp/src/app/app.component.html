@@ -1,11 +1,11 @@
 <mat-grid-list cols="2" rowHeight="50%" gutterSize="20">
   <mat-grid-tile
-    style="border: solid"
+    style="border: solid;"
     *ngFor="let dataset of datasets; let i = index"
   >
     <mat-grid-tile-header>Data Provider {{ i + 1 }}</mat-grid-tile-header>
     <app-dataprovider-viewer
-      style="height: 100%; width: 100%; margin-top: 100px"
+      style="height: 100%; width: 100%; margin-top: 100px;"
       [table]="dataset | async"
     ></app-dataprovider-viewer>
   </mat-grid-tile>
