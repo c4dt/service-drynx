@@ -9,7 +9,7 @@ import { KeyPair, Crypto } from './crypto'
 import proto from './proto.json'
 
 export class Client {
-  private readonly connection: Cothority.network.connection.WebSocketConnection;
+  private readonly connection: Cothority.network.WebSocketConnection;
   private readonly keys: KeyPair;
   private readonly crypto: Crypto;
 
@@ -22,7 +22,7 @@ export class Client {
     if (trimmedURL.endsWith('/')) {
       trimmedURL = trimmedURL.slice(0, trimmedURL.length - 1)
     }
-    this.connection = new Cothority.network.connection.WebSocketConnection(trimmedURL, 'drynx')
+    this.connection = new Cothority.network.WebSocketConnection(trimmedURL, 'drynx')
 
     const keys = KeyPair.random()
     this.crypto = new Crypto(keys)
