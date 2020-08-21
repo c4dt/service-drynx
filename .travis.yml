@@ -13,7 +13,7 @@ install:
   - chmod +x jq
   - export PATH=$PATH:$PWD
 before_script: npm i prettier && npx prettier --check 'webapp/src/**/*.html'
-script: make library-build library-test webapp-build webapp/dist/stackblitz
+script: make
 
 before_deploy:
   - echo "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_rsa"
