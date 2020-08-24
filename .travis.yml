@@ -23,6 +23,10 @@ deploy:
   - provider: script
     script: rsync -a --del webapp/dist/ drynx@c4dtsrv1.epfl.ch:www
     skip_cleanup: true
+    on:
+      condition: os = linux
   - provider: script
     script: cd library && npm version prerelease --preid=p`date +%Y%m%d%H%M%S` && npm publish --tag dev
     skip_cleanup: true
+    on:
+      condition: os = linux
