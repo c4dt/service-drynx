@@ -1,11 +1,30 @@
 .DEFAULT_GOAL := all
 
-services:
-	git clone -b drynx https://github.com/c4dt/services.git
-services/%: | services
+services/.git/HEAD:
+	git clone https://github.com/c4dt/services.git
+services/mk/service.mk: services/.git/HEAD
 	@: nothing
 
 include services/mk/service.mk
+
+$Ddrynx/.git/HEAD:
+	git clone https://github.com/c4dt/drynx $Ddrynx
+
+$Dcothority/.git/HEAD:
+	git clone https://github.com/dedis/cothority $Dcothority
+
+$Dcothority/proto.awk: $Dcothority/.git/HEAD
+$Ddrynx/lib/proto.go: $Ddrynx/.git/HEAD
+$Dprotobuf/drynx.proto: $Ddrynx/lib/proto.go | $Dcothority/proto.awk
+	awk -f $Dcothority/proto.awk $< > $@
+$Dprotobuf/proto.json: $Dprotobuf/drynx.proto
+
+cothority_protos := $(foreach p,network onet skipchain,$Dcothority/external/proto/$p.proto)
+$(cothority_protos): $Dcothority/.git/HEAD
+$Dprotobuf/proto.json: $(cothority_protos)
+
+$Slibrary-build: | $Dlibrary/src/proto.json
+$Dlibrary/src/proto.json: $Dprotobuf/proto.json; cp $< $@
 
 .PHONY: kubernetes-deploy
 kubernetes-deploy:
