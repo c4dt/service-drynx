@@ -9,10 +9,11 @@ addons:
   ssh_known_hosts: c4dtsrv1.epfl.ch
 
 install:
-  - curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o jq
-  - chmod +x jq
-  - export PATH=$PATH:$PWD
-before_script: npm i prettier && npx prettier --check 'webapp/src/**/*.html'
+  - jq=`mktemp`
+  - curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o $jq
+  - chmod +x $jq
+  - export PATH=$PATH:`dirname $jq`
+before_script: npm i -g prettier && npx prettier --check 'webapp/src/**/*.html'
 script: make
 after_script: out=`git status --porcelain`; echo "$out"; [ -z "$out" ]
 
