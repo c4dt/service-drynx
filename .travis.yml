@@ -16,6 +16,7 @@ install:
 before_script:
   - npm i -g prettier && npx prettier --check 'webapp/src/**/*.html'
   - rm library/src/proto.json # ensure correct generation
+  - rmdir node_modules # cleanup travis
 script: make
 after_script: out=`git status --porcelain`; echo "$out"; [ -z "$out" ]
 
