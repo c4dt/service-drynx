@@ -2,7 +2,7 @@
   >loading dataset...</ng-container
 >
 <ng-container *ngIf="table !== null && table !== undefined">
-  <cdk-virtual-scroll-viewport style="height: 100%;" itemSize="1">
+  <cdk-virtual-scroll-viewport style="height: 100%" itemSize="1">
     <mat-table [dataSource]="table.toObject()">
       <mat-header-row
         *matHeaderRowDef="table.header.toJS(); sticky: true"

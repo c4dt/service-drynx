@@ -1,6 +1,6 @@
 <mat-tab-group [(selectedIndex)]="tabIndex">
   <mat-tab label="query">
-    <div style="height: 100px;"></div>
+    <div style="height: 100px"></div>
     <form
       [formGroup]="queryBuilder"
       (ngSubmit)="runQuery(throwOnUndefined(buildQuery()))"
@@ -48,11 +48,11 @@
 
   <mat-tab label="result">
     <ng-container *ngIf="state[0] === 'loading'">
-      <div style="height: 100px;"></div>
+      <div style="height: 100px"></div>
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </ng-container>
     <ng-container *ngIf="state[0] === 'errored'">
-      <div style="height: 100px;"></div>
+      <div style="height: 100px"></div>
       Error: {{ state[1].message }}
     </ng-container>
     <ng-container *ngIf="state[0] === 'loaded'">
@@ -60,7 +60,7 @@
         [label]="state[1]"
         [columns]="state[2]"
         [results]="state[3]"
-        style="height: 100%;"
+        style="height: 100%"
       ></app-results-plotter>
     </ng-container>
   </mat-tab>

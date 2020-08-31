@@ -1,8 +1,8 @@
-<div style="height: 100%; width: 100%;">
+<div style="height: 100%; width: 100%">
   <ng-container
     *ngIf="results !== undefined && results !== null && results.size === 1"
   >
-    <div style="height: 100px;"></div>
+    <div style="height: 100px"></div>
     <h2>
       {{ label }}
       <ng-container *ngFor="let result of results">
@@ -30,7 +30,7 @@
     *ngIf="results !== undefined && results !== null && results.size == 3"
   >
     <div
-      style="height: 100%; width: 100%;"
+      style="height: 100%; width: 100%"
       visGraph3D
       [data]="visGraphData"
       [options]="visGraph3DOptions"
