@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "~9.0.5",
     "@angular/router": "~9.0.5",
     "@c4dt/drynx": "file:../library",
-    "@dedis/cothority": "^3.4.3",
+    "@dedis/cothority": "^3.5.2",
     "@dedis/kyber": "^3.4.2",
     "@types/vis": "^4.21.19",
     "angular-plotly.js": "^1.5.0",
