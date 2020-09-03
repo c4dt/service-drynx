@@ -29,7 +29,7 @@ export class AppComponent {
   }
 
   private static async getAndParseCSV (url: URL): Promise<List<List<string>>> {
-    const results = await new Promise<csv.ParseResult>((resolve, reject) => csv.parse(url.href, {
+    const results = await new Promise<csv.ParseResult<string[]>>((resolve, reject) => csv.parse(url.href, {
       download: true,
       delimiter: '\t',
       skipEmptyLines: true,

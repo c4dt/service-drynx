@@ -22,8 +22,6 @@ import { ResultsPlotterComponent } from './results-plotter/results-plotter.compo
 import { PlotlyViaCDNModule } from 'angular-plotly.js'
 import { VisGraph3DDirective } from './results-plotter/vis-graph.directive'
 
-PlotlyViaCDNModule.plotlyVersion = 'latest'
-
 @NgModule({
   declarations: [
     AppComponent,
