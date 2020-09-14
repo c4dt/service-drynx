@@ -7,34 +7,23 @@ import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatGridListModule } from '@angular/material/grid-list'
 import { MatListModule } from '@angular/material/list'
 import { MatSelectModule } from '@angular/material/select'
-import { MatTableModule } from '@angular/material/table'
 import { MatTabsModule } from '@angular/material/tabs'
 import { MatProgressBarModule } from '@angular/material/progress-bar'
-import { ScrollingModule } from '@angular/cdk/scrolling'
 
 import { AppComponent } from './app.component'
 import { QueryRunnerComponent } from './query-runner/query-runner.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { DataproviderViewerComponent } from './dataprovider-viewer/dataprovider-viewer.component'
-
-import { ResultsPlotterComponent } from './results-plotter/results-plotter.component'
-// TODO CDN because of plotly/plotly.js#3518
-import { PlotlyViaCDNModule } from 'angular-plotly.js'
-import { VisGraph3DDirective } from './results-plotter/vis-graph.directive'
+import { LibModule } from '@c4dt/angular-components'
 
 @NgModule({
   declarations: [
     AppComponent,
-    QueryRunnerComponent,
-    DataproviderViewerComponent,
-    ResultsPlotterComponent,
-    VisGraph3DDirective
+    QueryRunnerComponent
   ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
     ReactiveFormsModule,
-    ScrollingModule,
 
     MatButtonModule,
     MatFormFieldModule,
@@ -43,10 +32,9 @@ import { VisGraph3DDirective } from './results-plotter/vis-graph.directive'
     MatOptionModule,
     MatProgressBarModule,
     MatSelectModule,
-    MatTableModule,
     MatTabsModule,
 
-    PlotlyViaCDNModule
+    LibModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -4,10 +4,10 @@
     *ngFor="let dataset of datasets; let i = index"
   >
     <mat-grid-tile-header>Data Provider {{ i + 1 }}</mat-grid-tile-header>
-    <app-dataprovider-viewer
+    <lib-dataprovider-viewer
       style="height: 100%; width: 100%; margin-top: 100px"
       [table]="dataset | async"
-    ></app-dataprovider-viewer>
+    ></lib-dataprovider-viewer>
   </mat-grid-tile>
   <mat-grid-tile>
     <app-query-runner

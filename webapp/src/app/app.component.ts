@@ -3,12 +3,10 @@ import { List } from 'immutable'
 import { Component } from '@angular/core'
 import * as csv from 'papaparse'
 
-import { ColumnID } from '@c4dt/drynx'
 import { InstanceID } from '@dedis/cothority/byzcoin'
+import { ColumnType, ColumnMultiplied, ColumnDatedYears, ColumnDatedDays, ColumnRaw, Table } from '@c4dt/angular-components'
 
 import { ConfigService } from './config.service'
-import { ColumnType, ColumnMultiplied, ColumnDatedYears, ColumnDatedDays, ColumnRaw } from './columns'
-import { Table } from './dataprovider-viewer/dataprovider-viewer.component'
 
 @Component({
   selector: 'app-root',
@@ -16,7 +14,7 @@ import { Table } from './dataprovider-viewer/dataprovider-viewer.component'
 })
 export class AppComponent {
   public datasets: List<Promise<Table>>
-  public columns: Promise<List<[ColumnType, ColumnID]>>
+  public columns: Promise<List<[ColumnType, string]>>
 
   public readonly darc: InstanceID
 
@@ -86,15 +84,16 @@ export class AppComponent {
     })
 
     const content = (await datasetCSV).shift()
-    return new Table(types, header, content)
+    const convertedContent = content.map(l => l.toJS())
+    return new Table(types, header, convertedContent)
   }
 
-  private static getRelevantColumns (datasets: List<Table>): List<[ColumnType, ColumnID]> {
+  private static getRelevantColumns (datasets: List<Table>): List<[ColumnType, string]> {
     const first = datasets.get(0)
     if (first === undefined) {
       return List()
     }
-    const firstColumns: List<[ColumnType, ColumnID] | undefined> = first.types.zip(first.header)
+    const firstColumns: List<[ColumnType, string] | undefined> = first.types.zip(first.header)
 
     const merged = datasets.shift().reduce((acc, dataset) => {
       return acc.zipAll(dataset.types.zip(dataset.header))
@@ -109,7 +108,7 @@ export class AppComponent {
 
     // @ts-ignore
     // TODO filter for undefined doesn't reduce type
-    const filtered: List<[ColumnType, ColumnID]> = merged
+    const filtered: List<[ColumnType, string]> = merged
       .filter(column => column !== undefined)
 
     return filtered

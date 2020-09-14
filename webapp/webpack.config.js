@@ -1,3 +1,5 @@
 module.exports = {
-  node: {}
+  node: {
+    fs: 'empty'
+  }
 }

@@ -4,11 +4,11 @@ import { Input, Component, OnChanges } from '@angular/core'
 import { FormControl, FormGroup, Validators, AbstractControl } from '@angular/forms'
 
 import { ColumnID, SurveyQuery, Operation as DrynxOperation, Query, ServerIdentityList } from '@c4dt/drynx'
+import { ColumnType, Columns, OperationType, ResultType, Operation, Result } from '@c4dt/angular-components'
 import * as cothority from '@dedis/cothority'
 
 import { ClientService } from '../client.service'
 import { ConfigService } from '../config.service'
-import { ColumnType, Columns, OperationType, ResultType, Operation, Result } from '../columns'
 
 @Component({
   selector: 'app-query-runner',
@@ -22,7 +22,7 @@ export class QueryRunnerComponent implements OnChanges {
   // TODO take it from columns.ts
   public readonly allOperations = ['sum', 'mean', 'variance', 'standard deviation', 'linear regression']
   public operations: List<OperationType>
-  public tabIndex = 0;
+  public tabIndex = 0
 
   public readonly queryBuilder = new FormGroup({
     columns: new FormControl(undefined, Validators.required),
