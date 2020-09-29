@@ -14,7 +14,8 @@ install:
   - chmod +x $jq
   - export PATH=$PATH:`dirname $jq`
 before_script:
-  - npm i -g prettier && npx prettier --check 'webapp/src/**/*.html'
+  - npx prettier --check webapp
+  - ( cd webapp && npm ci && npx eslint --ext ts . )
   - rm library/src/proto.json # ensure correct generation
   - rmdir node_modules # cleanup travis
 script: make
