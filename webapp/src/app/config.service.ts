@@ -19,10 +19,6 @@ export class ConfigService {
       "hex"
     ),
     URL: new URL("wss://conode.c4dt.org:7771"),
-    LoginDarc: Buffer.from(
-      "4be97c0dead93e02079d5ba9e4c12078cc81f2b522d16512ed3eaeef3f3db4e8",
-      "hex"
-    ),
   };
 
   public readonly DataProviders = List.of(

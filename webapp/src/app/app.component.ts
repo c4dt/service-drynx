@@ -2,7 +2,6 @@ import { List } from "immutable";
 
 import { Component } from "@angular/core";
 
-import { InstanceID } from "@dedis/cothority/byzcoin";
 import {
   ColumnType,
   ColumnRaw,
@@ -20,8 +19,6 @@ export class AppComponent {
   public datasets: Promise<List<Table>>;
   public columns: Promise<List<[ColumnType, string]>>;
 
-  public readonly darc: InstanceID;
-
   constructor(config: ConfigService) {
     this.datasets = Promise.all(
       List(
@@ -33,7 +30,6 @@ export class AppComponent {
     this.columns = this.datasets.then((ret) =>
       AppComponent.getRelevantColumns(List(ret))
     );
-    this.darc = config.ByzCoin.LoginDarc;
   }
 
   private static getRelevantColumns(
