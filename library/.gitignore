@@ -1,3 +1,6 @@
+# dependencies
 /node_modules
-*.js
+
+# generated
+/src/proto.json
 /build

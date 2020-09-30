@@ -1,0 +1,124 @@
+syntax = "proto2";
+package libdrynx;
+
+// CipherVector is a copy of unlynx.CipherVector.
+// only for dedis/protobuf
+message CipherVector {
+  repeated CipherText content = 1;
+}
+
+// CipherText is a copy of unlynx.CipherText.
+// only for dedis/protobuf
+message CipherText {
+  optional bytes k = 1;
+  optional bytes c = 2;
+}
+
+// ServerIdentityList exists solely because dedis/protobuf doesn't support map[ServerIdentity][]ServerIdentity
+message ServerIdentityList {
+  repeated network.ServerIdentity content = 1;
+}
+
+// SurveyQuery is a serializable libdrynx.SurveyQuery.
+message SurveyQuery {
+  optional string surveyid = 1;
+  optional Query query = 2;
+  optional onet.Roster rosterservers = 3;
+   map<string, ServerIdentityList> servertodp = 4;
+   map<string, bytes> idtopublic = 5;
+  optional bytes clientpubkey = 6;
+  optional bool intramessage = 7;
+  // to define whether the query was sent by the querier or not
+  // Threshold for verification in skipChain service
+  optional double threshold = 8;
+  optional double aggregationproofthreshold = 9;
+  optional double obfuscationproofthreshold = 10;
+  optional double rangeproofthreshold = 11;
+  optional double keyswitchingproofthreshold = 12;
+}
+
+// ResponseDP contains the data provider's response to be sent to the server.
+message ResponseDP {
+  // group -> value(s)
+   map<string, CipherVector> data = 1;
+}
+
+//PublishSignatureBytes is the same as PublishSignature but the signatures are in bytes
+//need this because of G2 in protobuf not working
+message PublishSignatureBytes {
+  // y
+  optional bytes public = 1;
+  // A_i
+  optional bytes signature = 2;
+}
+
+// QueryDiffP contains diffP parameters for a query
+message QueryDiffP {
+  optional double lapmean = 1;
+  optional double lapscale = 2;
+  optional sint32 noiselistsize = 3;
+  optional double quanta = 4;
+  optional double scale = 5;
+  optional double limit = 6;
+}
+
+// PublishSignatureBytesList wraps []PublishSignatureBytes.
+message PublishSignatureBytesList {
+  repeated PublishSignatureBytes content = 1;
+}
+
+// QueryIVSigs contains parameters for input validation
+message QueryIVSigs {
+  repeated PublishSignatureBytesList inputvalidationsigs = 1;
+}
+
+// Int64List wraps []int64.
+message Int64List {
+  repeated sint64 content = 1 [packed=true];
+}
+
+// Query is used to transport query information through servers, to DPs
+message Query {
+  // query statement
+  optional Operation operation = 1;
+  repeated Int64List ranges = 2;
+  optional sint32 proofs = 3;
+  optional bool obfuscation = 4;
+  optional QueryDiffP diffp = 5;
+  // identity skipchain simulation
+  optional QueryIVSigs ivsigs = 6;
+  optional onet.Roster rostervns = 7;
+  // simulation
+  optional sint32 cuttingfactor = 8;
+  // allow to select which column to compute operation on
+  repeated string selector = 9;
+}
+
+// Operation defines the operation in the query
+message Operation {
+  optional string nameop = 1;
+  optional sint32 nbrinput = 2;
+  optional sint32 nbroutput = 3;
+  optional sint64 querymin = 4;
+  optional sint64 querymax = 5;
+  optional LogisticRegressionParameters lrparameters = 6;
+}
+
+// LogisticRegressionParameters are the parameters specific to logistic regression
+message LogisticRegressionParameters {
+  // logistic regression specific
+  optional string datasetname = 1;
+  optional string filepath = 2;
+  optional sint64 nbrrecords = 3;
+  optional sint64 nbrfeatures = 4;
+  repeated double means = 5;
+  repeated double standarddeviations = 6;
+  // parameters
+  optional double lambda = 7;
+  optional double step = 8;
+  optional sint32 maxiterations = 9;
+  repeated double initialweights = 10;
+  // approximation
+  optional sint32 k = 11;
+  optional double precisionapproxcoefficients = 12;
+}

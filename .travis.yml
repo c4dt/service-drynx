@@ -16,7 +16,7 @@ install:
 before_script:
   - npx prettier --check webapp
   - ( cd webapp && npm ci && npx eslint --ext ts . )
-  - rm library/src/proto.json # ensure correct generation
+  - rm protobuf/drynx.proto # ensure correct generation
 script: make
 after_script:
   - set -e
