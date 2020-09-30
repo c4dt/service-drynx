@@ -18,7 +18,9 @@ before_script:
   - ( cd webapp && npm ci && npx eslint --ext ts . )
   - rm library/src/proto.json # ensure correct generation
 script: make
-after_script: out=`git status --porcelain`; echo "$out"; [ -z "$out" ] || exit 1
+after_script:
+  - set -e
+  - out=`git status --porcelain`; [ -z "$out" ] || ( git diff; exit 1 )
 
 before_deploy:
   - echo "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_rsa"
