@@ -16,19 +16,17 @@ import { ConfigService } from "./config.service";
   templateUrl: "./app.component.html",
 })
 export class AppComponent {
-  public datasets: Promise<List<Table>>;
+  public datasets: List<Promise<Table>>;
   public columns: Promise<List<[ColumnType, string]>>;
 
   constructor(config: ConfigService) {
-    this.datasets = Promise.all(
-      List(
-        config.DataProviders.map(async (dp) =>
-          fetchDataset(dp.datasetURL, dp.datasetTypesURL)
-        )
+    this.datasets = List(
+      config.DataProviders.map(async (dp) =>
+        fetchDataset(dp.datasetURL, dp.datasetTypesURL)
       )
-    ).then((l) => List(l));
-    this.columns = this.datasets.then((ret) =>
-      AppComponent.getRelevantColumns(List(ret))
+    );
+    this.columns = Promise.all(this.datasets).then((datasets) =>
+      AppComponent.getRelevantColumns(List(datasets))
     );
   }
 
