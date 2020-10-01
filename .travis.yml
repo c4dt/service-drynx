@@ -31,11 +31,13 @@ deploy:
     script: rsync -a --del webapp/dist/ drynx@c4dtsrv1.epfl.ch:www
     skip_cleanup: true
     on:
+      branch: main
       condition: $TRAVIS_OS_NAME = linux
   - provider: script
     script: cd library && npm version prerelease --preid=p`date +%Y%m%d%H%M%S` && npm publish --tag dev
     skip_cleanup: true
     on:
+      branch: main
       condition: $TRAVIS_OS_NAME = linux
 
 cache:
