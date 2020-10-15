@@ -62,7 +62,7 @@ describe("pairing", function () {
   });
 
   it("should keep already computed decryption, with warmDecryption", () => {
-    testDecryptWithWarmer((crypto, clear, _) => {
+    testDecryptWithWarmer((crypto, clear) => {
       crypto.warmDecryption(new Range(-clear, clear));
     });
   });
