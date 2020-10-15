@@ -18,7 +18,7 @@ before_script:
   - ( cd webapp && npm ci && npx eslint --ext ts . )
   - rm protobuf/drynx.proto # ensure correct generation
 script: make
-after_script:
+after_success:
   - set -e
   - out=`git status --porcelain`; [ -z "$out" ] || ( git diff; exit 1 )
 
