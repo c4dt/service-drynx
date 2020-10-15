@@ -22,6 +22,7 @@ import {
   ResultType,
   Operation,
   Result,
+  isColumnType,
 } from "@c4dt/angular-components";
 import * as cothority from "@dedis/cothority";
 
@@ -49,7 +50,7 @@ export class QueryRunnerComponent implements OnChanges {
     "standard deviation",
     "linear regression",
   ];
-  public operations: List<OperationType>;
+  public operations: List<Operation>;
   public tabIndex = 0;
 
   public readonly queryBuilder = new FormGroup({
@@ -65,34 +66,62 @@ export class QueryRunnerComponent implements OnChanges {
     this.operations = List();
   }
 
-  private getForm(name: "columns" | "operation"): AbstractControl {
+  private getFormElement(name: "columns" | "operation"): AbstractControl {
     const form = this.queryBuilder.get(name);
-    if (form === null) {
-      throw new Error();
-    }
+    if (form === null) throw new Error(`input "${name}" not found`);
     return form;
   }
 
-  private getFormValue(name: "columns" | "operation"): any | undefined {
-    const form = this.getForm(name);
-    if (form.value === null) {
-      return undefined;
-    }
+  private getFormValue(name: "columns" | "operation"): unknown | undefined {
+    const form = this.getFormElement(name);
+    if (form.value === null) return undefined;
     return form.value;
   }
 
   private getColumnsValue(): List<[ColumnType, ColumnID]> | undefined {
-    const value: Array<[ColumnType, ColumnID]> | undefined = this.getFormValue(
-      "columns"
-    );
-    if (value === undefined) {
-      return undefined;
-    }
-    return List(value).sortBy((v) => v[1]);
+    const values = this.getFormValue("columns");
+    if (values === undefined) return undefined;
+
+    if (!Array.isArray(values))
+      throw new Error(`input "columns" didn't returned an array: ${values}`);
+
+    const list = List(values as unknown[]);
+    if (list.some((tuple) => !Array.isArray(tuple)))
+      throw new Error(
+        `input "columns" returned an array with unexpected elements: ${values}`
+      );
+    if ((list as List<unknown[]>).some((tuple) => tuple.length !== 2))
+      throw new Error(
+        `input "columns" returned an array with unexpected tuples' size: ${values}`
+      );
+    if (
+      (list as List<[unknown, unknown]>).some(
+        ([t, id]) => !isColumnType(t) || typeof id !== "string"
+      )
+    )
+      throw new Error(
+        `input "columns" returned an array with unexpected tuples' types: ${values}`
+      );
+
+    return (list as List<[ColumnType, string]>).sortBy((v) => v[1]);
   }
 
   private getOperationValue(): OperationType | undefined {
-    return this.getFormValue("operation");
+    const value = this.getFormValue("operation");
+
+    switch (value) {
+      case undefined:
+      case "sum":
+      case "mean":
+      case "variance":
+      case "standard deviation":
+      case "linear regression":
+        return value;
+    }
+
+    throw new Error(
+      `form's input "operations" returned an unexpected value: ${value}`
+    );
   }
 
   ngOnChanges(): void {
@@ -100,10 +129,10 @@ export class QueryRunnerComponent implements OnChanges {
     if (columnsValue === undefined) {
       return;
     }
-    const operationForm = this.getForm("operation");
+    const operationForm = this.getFormElement("operation");
 
-    const columns = new Columns(List(columnsValue).map(([t, _]) => t));
-    this.operations = columns.validOperations.map((op) => op.type);
+    const columns = new Columns(List(columnsValue).map(([t]) => t));
+    this.operations = columns.validOperations;
 
     if (this.operations.size === 1) {
       const first = this.operations.get(0);
@@ -118,7 +147,7 @@ export class QueryRunnerComponent implements OnChanges {
       return undefined;
     }
 
-    const columns = new Columns(columnsValue.map(([t, _]) => t));
+    const columns = new Columns(columnsValue.map(([t]) => t));
     const matches = columns.validOperations.filter(
       (op) => op.type === operationValue
     );
@@ -142,7 +171,7 @@ export class QueryRunnerComponent implements OnChanges {
       new SurveyQuery({
         surveyid: "test-query",
         query: new Query({
-          selector: columnsValue.map(([_, id]) => id).toArray(),
+          selector: columnsValue.map(([, id]) => id).toArray(),
           operation: new DrynxOperation({
             nameop:
               operationValue === "linear regression"

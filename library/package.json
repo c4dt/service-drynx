@@ -25,6 +25,7 @@
   "dependencies": {
     "@dedis/cothority": "^3.5.2",
     "@dedis/kyber": "^3.4.4-p2007.2104.5857.0",
+    "eslint-config-prettier": "^6.12.0",
     "gaussian-elimination": "^1.0.2",
     "immutable": "^4.0.0-rc.12",
     "protobufjs": "^6.10.1",

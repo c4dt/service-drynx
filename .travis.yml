@@ -15,7 +15,8 @@ install:
   - export PATH=$PATH:`dirname $jq`
 before_script:
   - npx prettier --check .
-  - ( cd webapp && npm ci && npx eslint --ext ts . )
+  - set -e; for d in library webapp; do
+    ( cd $d && npm ci && npx eslint --ext ts --max-warnings 0 . ); done
   - rm protobuf/drynx.proto # ensure correct generation
 script: make
 after_success:
