@@ -17,6 +17,11 @@ services:
     image: nginx:latest
     ports:
       - 8080:80
-    entrypoint: ["/bin/sh", "-c", "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'"]
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'",
+      ]
     volumes:
       - ./datasets:/usr/share/nginx/html

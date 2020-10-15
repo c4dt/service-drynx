@@ -15,14 +15,19 @@ spec:
         app: drynx-http-datasets
     spec:
       containers:
-      - name: http-dataset
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-        command: ["/bin/sh", "-xc", "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'"]
-        volumeMounts:
-          - name: datasets
-            mountPath: /usr/share/nginx/html
+        - name: http-dataset
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          command:
+            [
+              "/bin/sh",
+              "-xc",
+              "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'",
+            ]
+          volumeMounts:
+            - name: datasets
+              mountPath: /usr/share/nginx/html
       volumes:
         - name: datasets
           configMap:

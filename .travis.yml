@@ -14,7 +14,7 @@ install:
   - chmod +x $jq
   - export PATH=$PATH:`dirname $jq`
 before_script:
-  - npx prettier --check webapp
+  - npx prettier --check .
   - ( cd webapp && npm ci && npx eslint --ext ts . )
   - rm protobuf/drynx.proto # ensure correct generation
 script: make
