@@ -50,7 +50,7 @@ export class QueryRunnerComponent implements OnChanges {
     "standard deviation",
     "linear regression",
   ];
-  public operations: List<OperationType>;
+  public operations: List<Operation>;
   public tabIndex = 0;
 
   public readonly queryBuilder = new FormGroup({
@@ -132,7 +132,7 @@ export class QueryRunnerComponent implements OnChanges {
     const operationForm = this.getFormElement("operation");
 
     const columns = new Columns(List(columnsValue).map(([t]) => t));
-    this.operations = columns.validOperations.map((op) => op.type);
+    this.operations = columns.validOperations;
 
     if (this.operations.size === 1) {
       const first = this.operations.get(0);
