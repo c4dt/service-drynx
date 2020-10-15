@@ -37,7 +37,7 @@ export class QueryRunnerComponent implements OnChanges {
     | ["nothing-ran"]
     | ["loading"]
     | ["loaded", string, Columns, List<[ResultType, Result]>]
-    | ["errored", Error];
+    | ["errored", Error] = ["nothing-ran"];
 
   @Input() public columns: List<[ColumnType, ColumnID]> | null | undefined;
 
@@ -49,7 +49,7 @@ export class QueryRunnerComponent implements OnChanges {
     "standard deviation",
     "linear regression",
   ];
-  public operations: List<Operation>;
+  public operations: List<Operation> = List();
   public tabIndex = 0;
 
   public readonly queryBuilder = new FormGroup({
@@ -60,10 +60,7 @@ export class QueryRunnerComponent implements OnChanges {
   constructor(
     private readonly client: ClientService,
     private readonly config: ConfigService
-  ) {
-    this.state = ["nothing-ran"];
-    this.operations = List();
-  }
+  ) {}
 
   private getFormElement(name: "columns" | "operation"): AbstractControl {
     const form = this.queryBuilder.get(name);
@@ -118,18 +115,13 @@ export class QueryRunnerComponent implements OnChanges {
 
   ngOnChanges(): void {
     const columnsValue = this.getColumnsValue();
-    if (columnsValue === undefined) {
-      return;
-    }
-    const operationForm = this.getFormElement("operation");
+    if (columnsValue === undefined) return;
 
     const columns = new Columns(List(columnsValue).map(([t]) => t));
     this.operations = columns.validOperations;
 
-    if (this.operations.size === 1) {
-      const first = this.operations.get(0);
-      operationForm.setValue(first);
-    }
+    const operationForm = this.getFormElement("operation");
+    operationForm.setValue(this.operations.get(0));
   }
 
   buildQuery(): [Columns, Operation, SurveyQuery] | undefined {
@@ -143,10 +135,9 @@ export class QueryRunnerComponent implements OnChanges {
       this.config.DataProviders.map((d) => d.identity)
     );
 
-    let idToPublic: Map<string, Buffer> = Map();
-    for (const n of ids) {
-      idToPublic = idToPublic.set(n.address, n.public);
-    }
+    const idToPublic: Map<string, Buffer> = Map(
+      ids.map((id) => [id.address, id.public])
+    );
 
     return [
       columns,
@@ -160,9 +151,7 @@ export class QueryRunnerComponent implements OnChanges {
               operation.type === "linear regression"
                 ? "lin_reg"
                 : operation.type,
-            // TODO only for linear regression for two rows
-            nbrinput:
-              operation.type === "linear regression" ? columns.items.size : 1,
+            nbrinput: columns.items.size,
           }),
         }),
         rosterservers: new cothority.network.Roster({ list: ids.toArray() }),
@@ -177,9 +166,7 @@ export class QueryRunnerComponent implements OnChanges {
   }
 
   throwOnUndefined<T>(val: T | undefined): T {
-    if (val === undefined) {
-      throw new Error("undefined found");
-    }
+    if (val === undefined) throw new Error("undefined value");
     return val;
   }
 
@@ -188,21 +175,17 @@ export class QueryRunnerComponent implements OnChanges {
     Operation,
     SurveyQuery
   ]): Promise<void> {
-    this.state = ["loading"];
-
-    if (query.query === undefined) {
-      throw new Error("run query without query");
-    }
-    if (query.query.operation === undefined) {
+    if (query.query === undefined) throw new Error("run query without query");
+    if (query.query.operation === undefined)
       throw new Error("run query without operation");
-    }
+
+    this.state = ["loading"];
+    this.tabIndex = 1;
 
     try {
-      this.tabIndex = 1;
       const { computed } = await this.client.run(query);
-      if (computed === undefined) {
-        throw new Error("undefined operation");
-      }
+      if (computed === undefined) throw new Error("undefined results");
+
       const label = `The ${query.query.operation.nameop} of ${columns.items
         .map((c) => c.name)
         .join()} is:`;
