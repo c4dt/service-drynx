@@ -18,7 +18,6 @@ import {
 import {
   ColumnType,
   Columns,
-  OperationType,
   ResultType,
   Operation,
   Result,
@@ -106,22 +105,15 @@ export class QueryRunnerComponent implements OnChanges {
     return (list as List<[ColumnType, string]>).sortBy((v) => v[1]);
   }
 
-  private getOperationValue(): OperationType | undefined {
+  private getOperationValue(): Operation | undefined {
     const value = this.getFormValue("operation");
 
-    switch (value) {
-      case undefined:
-      case "sum":
-      case "mean":
-      case "variance":
-      case "standard deviation":
-      case "linear regression":
-        return value;
-    }
+    if (!(value instanceof Operation))
+      throw new Error(
+        `form's input "operations" returned an unexpected value: ${value}`
+      );
 
-    throw new Error(
-      `form's input "operations" returned an unexpected value: ${value}`
-    );
+    return value;
   }
 
   ngOnChanges(): void {
@@ -141,20 +133,11 @@ export class QueryRunnerComponent implements OnChanges {
   }
 
   buildQuery(): [Columns, Operation, SurveyQuery] | undefined {
-    const operationValue = this.getOperationValue();
+    const operation = this.getOperationValue();
     const columnsValue = this.getColumnsValue();
-    if (operationValue === undefined || columnsValue === undefined) {
-      return undefined;
-    }
+    if (operation === undefined || columnsValue === undefined) return undefined;
 
     const columns = new Columns(columnsValue.map(([t]) => t));
-    const matches = columns.validOperations.filter(
-      (op) => op.type === operationValue
-    );
-    const operation = matches.get(0);
-    if (operation === undefined || matches.size > 1) {
-      throw new Error();
-    }
 
     const ids = List.of(this.config.ComputingNode).concat(
       this.config.DataProviders.map((d) => d.identity)
@@ -174,12 +157,12 @@ export class QueryRunnerComponent implements OnChanges {
           selector: columnsValue.map(([, id]) => id).toArray(),
           operation: new DrynxOperation({
             nameop:
-              operationValue === "linear regression"
+              operation.type === "linear regression"
                 ? "lin_reg"
-                : operationValue,
+                : operation.type,
             // TODO only for linear regression for two rows
             nbrinput:
-              operationValue === "linear regression" ? columns.items.size : 1,
+              operation.type === "linear regression" ? columns.items.size : 1,
           }),
         }),
         rosterservers: new cothority.network.Roster({ list: ids.toArray() }),
