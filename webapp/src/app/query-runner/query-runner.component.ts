@@ -15,18 +15,12 @@ import {
   Query,
   ServerIdentityList,
 } from "@c4dt/drynx";
-import {
-  ColumnType,
-  Columns,
-  ResultType,
-  Operation,
-  Result,
-  isColumnType,
-} from "@c4dt/angular-components";
+import { ColumnType, isColumnType } from "@c4dt/angular-components";
 import * as cothority from "@dedis/cothority";
 
 import { ClientService } from "../client.service";
 import { ConfigService } from "../config.service";
+import { getValidOperations, Operation, Result } from "../operations";
 
 @Component({
   selector: "app-query-runner",
@@ -36,19 +30,12 @@ export class QueryRunnerComponent implements OnChanges {
   public state:
     | ["nothing-ran"]
     | ["loading"]
-    | ["loaded", string, Columns, List<[ResultType, Result]>]
+    | ["loaded: single result", string, Result]
+    | ["loaded: many results", List<number>, List<ColumnType>]
     | ["errored", Error] = ["nothing-ran"];
 
   @Input() public columns: List<[ColumnType, ColumnID]> | null | undefined;
 
-  // TODO take it from columns.ts
-  public readonly allOperations = [
-    "sum",
-    "mean",
-    "variance",
-    "standard deviation",
-    "linear regression",
-  ];
   public operations: List<Operation> = List();
   public tabIndex = 0;
 
@@ -117,19 +104,18 @@ export class QueryRunnerComponent implements OnChanges {
     const columnsValue = this.getColumnsValue();
     if (columnsValue === undefined) return;
 
-    const columns = new Columns(List(columnsValue).map(([t]) => t));
-    this.operations = columns.validOperations;
+    this.operations = getValidOperations(columnsValue.map(([t]) => t));
 
     const operationForm = this.getFormElement("operation");
     operationForm.setValue(this.operations.get(0));
   }
 
-  buildQuery(): [Columns, Operation, SurveyQuery] | undefined {
+  buildQuery(): [List<ColumnType>, Operation, SurveyQuery] | undefined {
     const operation = this.getOperationValue();
     const columnsValue = this.getColumnsValue();
     if (operation === undefined || columnsValue === undefined) return undefined;
 
-    const columns = new Columns(columnsValue.map(([t]) => t));
+    const columns = columnsValue.map(([t]) => t);
 
     const ids = List.of(this.config.ComputingNode).concat(
       this.config.DataProviders.map((d) => d.identity)
@@ -148,10 +134,10 @@ export class QueryRunnerComponent implements OnChanges {
           selector: columnsValue.map(([, id]) => id).toArray(),
           operation: new DrynxOperation({
             nameop:
-              operation.type === "linear regression"
+              operation.kind === "linear regression"
                 ? "lin_reg"
-                : operation.type,
-            nbrinput: columns.items.size,
+                : operation.kind,
+            nbrinput: columns.size,
           }),
         }),
         rosterservers: new cothority.network.Roster({ list: ids.toArray() }),
@@ -171,7 +157,7 @@ export class QueryRunnerComponent implements OnChanges {
   }
 
   async runQuery([columns, operation, query]: [
-    Columns,
+    List<ColumnType>,
     Operation,
     SurveyQuery
   ]): Promise<void> {
@@ -186,11 +172,17 @@ export class QueryRunnerComponent implements OnChanges {
       const { computed } = await this.client.run(query);
       if (computed === undefined) throw new Error("undefined results");
 
-      const label = `The ${query.query.operation.nameop} of ${columns.items
-        .map((c) => c.name)
-        .join()} is:`;
       const results = operation.formatResults(computed);
-      this.state = ["loaded", label, columns, results];
+
+      if (results.size === 1)
+        this.state = [
+          "loaded: single result",
+          `The ${query.query.operation.nameop} of ${columns
+            .map((c) => c.name)
+            .join()} is:`,
+          results.get(0) as Result,
+        ];
+      else this.state = ["loaded: many results", computed, columns];
     } catch (e) {
       const error = e instanceof Error ? e : new Error(e);
       this.state = ["errored", error];

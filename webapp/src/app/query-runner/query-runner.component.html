@@ -26,7 +26,7 @@
             <mat-label>operation</mat-label>
             <mat-select formControlName="operation">
               <mat-option *ngFor="let op of operations" [value]="op">
-                {{ op.type }}
+                {{ op.kind }}
               </mat-option>
             </mat-select>
           </mat-form-field></mat-list-item
@@ -51,15 +51,35 @@
       <div style="height: 100px"></div>
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </ng-container>
+
     <ng-container *ngIf="state[0] === 'errored'">
       <div style="height: 100px"></div>
       Error: {{ state[1].message }}
     </ng-container>
-    <ng-container *ngIf="state[0] === 'loaded'">
+
+    <ng-container *ngIf="state[0] === 'loaded: single result'">
+      <div style="height: 100px"></div>
+      {{ state[1] }}
+      <h2>
+        <ng-container *ngIf="state[2][0] === 'number'">
+          {{ state[2][1] | number }}
+        </ng-container>
+        <ng-container *ngIf="state[2][0] === 'date/years'">
+          {{ state[2][1] | date: "yyyy" }}
+        </ng-container>
+        <ng-container *ngIf="state[2][0] === 'date/days'">
+          {{ state[2][1] | date }}
+        </ng-container>
+        <ng-container *ngIf="state[2][0] === 'string'">
+          {{ state[2][1] }}
+        </ng-container>
+      </h2>
+    </ng-container>
+
+    <ng-container *ngIf="state[0] === 'loaded: many results'">
       <app-results-plotter
-        [label]="state[1]"
+        [factors]="state[1]"
         [columns]="state[2]"
-        [results]="state[3]"
         style="height: 100%"
       ></app-results-plotter>
     </ng-container>

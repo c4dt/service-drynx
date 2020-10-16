@@ -2,12 +2,7 @@ import { List } from "immutable";
 
 import { Component } from "@angular/core";
 
-import {
-  ColumnType,
-  ColumnRaw,
-  Table,
-  fetchDataset,
-} from "@c4dt/angular-components";
+import { ColumnType, Table, fetchDataset } from "@c4dt/angular-components";
 
 import { ConfigService } from "./config.service";
 
@@ -39,7 +34,7 @@ export class AppComponent {
     if (firstDataset === undefined) return List();
 
     return firstDataset.columns
-      .filter((column) => !(column[1] instanceof ColumnRaw))
+      .filter((column) => !(column[1].kind === "string"))
       .map((column) => [column[1], column[0]]);
   }
 }
