@@ -2,9 +2,15 @@ import { List } from "immutable";
 
 import { Component } from "@angular/core";
 
-import { ColumnType, Table, fetchDataset } from "@c4dt/angular-components";
+import {
+  ColumnTypes,
+  Table,
+  fetchDataset,
+  StringColumn,
+} from "@c4dt/angular-components";
 
 import { ConfigService } from "./config.service";
+import { OperationableColumnTypes } from "./operations";
 
 @Component({
   selector: "app-root",
@@ -12,7 +18,7 @@ import { ConfigService } from "./config.service";
 })
 export class AppComponent {
   public datasets: List<Promise<Table>>;
-  public columns: Promise<List<[ColumnType, string]>>;
+  public columns: Promise<List<ColumnTypes>>;
 
   constructor(config: ConfigService) {
     this.datasets = List(
@@ -27,14 +33,14 @@ export class AppComponent {
 
   private static getRelevantColumns(
     datasets: List<Table>
-  ): List<[ColumnType, string]> {
+  ): List<OperationableColumnTypes> {
     // TODO check that all datasets have the same types & names
 
     const firstDataset = datasets.get(0);
     if (firstDataset === undefined) return List();
 
-    return firstDataset.columns
-      .filter((column) => !(column[1].kind === "string"))
-      .map((column) => [column[1], column[0]]);
+    return firstDataset.columns.filter(
+      (column) => !(column instanceof StringColumn)
+    ) as List<OperationableColumnTypes>;
   }
 }

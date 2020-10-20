@@ -8,7 +8,9 @@ import {
   ColumnsForLinearRegression,
   interpolationRange,
   getMaximumWidth,
+  dateValueForColumn,
 } from "../results-plotter";
+import { DatedDaysColumn, DatedYearsColumn } from "@c4dt/angular-components";
 
 type Point3D = [number, number, number];
 
@@ -47,7 +49,7 @@ export class ResultsPlotter3DComponent implements OnChanges {
       interpolationRange.map((b) => [a, b])
     );
     const interpolated = inputs.map(
-      ([a, b]) => factors[2] * a + factors[1] * b + factors[0]
+      ([a, b]) => factors[2] * b + factors[1] * a + factors[0]
     );
 
     const points = inputs
@@ -55,9 +57,18 @@ export class ResultsPlotter3DComponent implements OnChanges {
       .map(([input, value]) => [input[0], input[1], value]);
     const scaled: Seq.Indexed<Point3D> = points.map(
       (point) =>
-        point.map((value, i) =>
-          scaleResult(["interpolated linear regression", columns[i]], value)
-        ) as Point3D
+        point.map((value, i) => {
+          const scaled = scaleResult(
+            ["interpolated linear regression", columns[i]],
+            value
+          );
+          if (scaled instanceof Date)
+            return dateValueForColumn(
+              columns[i] as DatedDaysColumn | DatedYearsColumn,
+              scaled
+            );
+          return scaled;
+        }) as Point3D
     );
 
     const [width, height] = getMaximumWidth();

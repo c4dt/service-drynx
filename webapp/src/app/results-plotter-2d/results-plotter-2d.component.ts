@@ -53,14 +53,24 @@ export class ResultsPlotter2DComponent implements OnChanges {
         ) as Point2D
     );
 
-    const autoMinRange = scaled.min();
-    if (autoMinRange === undefined) throw new Error("mininum point not found");
-    const minRange = autoMinRange.map((min, i) =>
-      columns[i] instanceof MultipliedColumn && min > 0 ? 0 : min
-    ) as Point2D;
+    const minRange: Point2D = scaled.reduce(
+      (acc, point) => [
+        acc[0] < point[0] ? acc[0] : point[0],
+        acc[1] < point[1] ? acc[1] : point[1],
+      ],
+      [
+        columns[0] instanceof MultipliedColumn ? 0 : Number.MAX_VALUE,
+        columns[1] instanceof MultipliedColumn ? 0 : Number.MAX_VALUE,
+      ]
+    );
 
-    const maxRange = scaled.max();
-    if (maxRange === undefined) throw new Error("maximum point not found");
+    const maxRange: Point2D = scaled.reduce(
+      (acc, point) => [
+        acc[0] > point[0] ? acc[0] : point[0],
+        acc[1] > point[1] ? acc[1] : point[1],
+      ],
+      [Number.MIN_VALUE, Number.MIN_VALUE]
+    );
 
     const [width, height] = getMaximumWidth();
     this.plotlyGraph = {

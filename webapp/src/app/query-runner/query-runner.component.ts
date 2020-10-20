@@ -9,18 +9,30 @@ import {
 } from "@angular/forms";
 
 import {
-  ColumnID,
   SurveyQuery,
   Operation as DrynxOperation,
   Query,
   ServerIdentityList,
 } from "@c4dt/drynx";
-import { ColumnType, isColumnType } from "@c4dt/angular-components";
+import {
+  AngularColumnTypes,
+  ColumnTypes,
+  isColumnType,
+  StringColumn,
+  toAngularColumnTypes,
+} from "@c4dt/angular-components";
 import * as cothority from "@dedis/cothority";
 
 import { ClientService } from "../client.service";
 import { ConfigService } from "../config.service";
-import { getValidOperations, Operation, Result } from "../operations";
+import {
+  getValidOperations,
+  Operation,
+  OperationableColumnTypes,
+  isOperation,
+  scaleResult,
+  isScalableOperationAndColumn,
+} from "../operations";
 
 @Component({
   selector: "app-query-runner",
@@ -30,11 +42,24 @@ export class QueryRunnerComponent implements OnChanges {
   public state:
     | ["nothing-ran"]
     | ["loading"]
-    | ["loaded: single result", string, Result]
-    | ["loaded: many results", List<number>, List<ColumnType>]
+    | ["loaded: single result", string, [AngularColumnTypes, number | Date]]
+    | [
+        "loaded: two results",
+        [OperationableColumnTypes, OperationableColumnTypes],
+        [number, number]
+      ]
+    | [
+        "loaded: three results",
+        [
+          OperationableColumnTypes,
+          OperationableColumnTypes,
+          OperationableColumnTypes
+        ],
+        [number, number, number]
+      ]
     | ["errored", Error] = ["nothing-ran"];
 
-  @Input() public columns: List<[ColumnType, ColumnID]> | null | undefined;
+  @Input() public columns: List<ColumnTypes> | null | undefined;
 
   public operations: List<Operation> = List();
   public tabIndex = 0;
@@ -61,7 +86,7 @@ export class QueryRunnerComponent implements OnChanges {
     return form.value;
   }
 
-  private getColumnsValue(): List<[ColumnType, ColumnID]> | undefined {
+  private getColumnsValue(): List<OperationableColumnTypes> | undefined {
     const values = this.getFormValue("columns");
     if (values === undefined) return undefined;
 
@@ -69,30 +94,24 @@ export class QueryRunnerComponent implements OnChanges {
       throw new Error(`input "columns" didn't returned an array: ${values}`);
 
     const list = List(values as unknown[]);
-    if (list.some((tuple) => !Array.isArray(tuple)))
-      throw new Error(
-        `input "columns" returned an array with unexpected elements: ${values}`
-      );
-    if ((list as List<unknown[]>).some((tuple) => tuple.length !== 2))
-      throw new Error(
-        `input "columns" returned an array with unexpected tuples' size: ${values}`
-      );
     if (
-      (list as List<[unknown, unknown]>).some(
-        ([t, id]) => !isColumnType(t) || typeof id !== "string"
+      (list as List<unknown>).some(
+        (t) => !isColumnType(t) || t instanceof StringColumn
       )
     )
       throw new Error(
         `input "columns" returned an array with unexpected tuples' types: ${values}`
       );
 
-    return (list as List<[ColumnType, string]>).sortBy((v) => v[1]);
+    return (list as List<OperationableColumnTypes>).sortBy(
+      (column) => column.name
+    );
   }
 
   private getOperationValue(): Operation | undefined {
     const value = this.getFormValue("operation");
 
-    if (!(value instanceof Operation))
+    if (!isOperation(value))
       throw new Error(
         `form's input "operations" returned an unexpected value: ${value}`
       );
@@ -104,18 +123,18 @@ export class QueryRunnerComponent implements OnChanges {
     const columnsValue = this.getColumnsValue();
     if (columnsValue === undefined) return;
 
-    this.operations = getValidOperations(columnsValue.map(([t]) => t));
+    this.operations = getValidOperations(columnsValue);
 
     const operationForm = this.getFormElement("operation");
     operationForm.setValue(this.operations.get(0));
   }
 
-  buildQuery(): [List<ColumnType>, Operation, SurveyQuery] | undefined {
+  buildQuery():
+    | [List<OperationableColumnTypes>, Operation, SurveyQuery]
+    | undefined {
     const operation = this.getOperationValue();
-    const columnsValue = this.getColumnsValue();
-    if (operation === undefined || columnsValue === undefined) return undefined;
-
-    const columns = columnsValue.map(([t]) => t);
+    const columns = this.getColumnsValue();
+    if (operation === undefined || columns === undefined) return undefined;
 
     const ids = List.of(this.config.ComputingNode).concat(
       this.config.DataProviders.map((d) => d.identity)
@@ -131,12 +150,9 @@ export class QueryRunnerComponent implements OnChanges {
       new SurveyQuery({
         surveyid: "test-query",
         query: new Query({
-          selector: columnsValue.map(([, id]) => id).toArray(),
+          selector: columns.map((column) => column.name).toArray(),
           operation: new DrynxOperation({
-            nameop:
-              operation.kind === "linear regression"
-                ? "lin_reg"
-                : operation.kind,
+            nameop: operation === "linear regression" ? "lin_reg" : operation,
             nbrinput: columns.size,
           }),
         }),
@@ -157,7 +173,7 @@ export class QueryRunnerComponent implements OnChanges {
   }
 
   async runQuery([columns, operation, query]: [
-    List<ColumnType>,
+    List<OperationableColumnTypes>,
     Operation,
     SurveyQuery
   ]): Promise<void> {
@@ -172,17 +188,53 @@ export class QueryRunnerComponent implements OnChanges {
       const { computed } = await this.client.run(query);
       if (computed === undefined) throw new Error("undefined results");
 
-      const results = operation.formatResults(computed);
+      if (computed.size !== columns.size)
+        throw new Error("results' size not matched to columns' size");
 
-      if (results.size === 1)
+      if (computed.size === 1) {
+        const column = columns.get(0) as OperationableColumnTypes;
+        const result = computed.get(0) as number;
+
+        if (operation === "linear regression")
+          throw new Error("linear regression results on a single column");
+        const operationAndColumn: [Operation, OperationableColumnTypes] = [
+          operation,
+          column,
+        ];
+        if (!isScalableOperationAndColumn(operationAndColumn))
+          throw new Error("unable to match operation and column for result");
+
+        const scaled = scaleResult(operationAndColumn, result);
+
         this.state = [
           "loaded: single result",
           `The ${query.query.operation.nameop} of ${columns
             .map((c) => c.name)
             .join()} is:`,
-          results.get(0) as Result,
+          [toAngularColumnTypes(column), scaled],
         ];
-      else this.state = ["loaded: many results", computed, columns];
+      } else if (computed.size === 2) {
+        this.state = [
+          "loaded: two results",
+          columns.toArray() as [
+            OperationableColumnTypes,
+            OperationableColumnTypes
+          ],
+          computed.toArray() as [number, number],
+        ];
+      } else if (computed.size === 3) {
+        this.state = [
+          "loaded: three results",
+          columns.toArray() as [
+            OperationableColumnTypes,
+            OperationableColumnTypes,
+            OperationableColumnTypes
+          ],
+          computed.toArray() as [number, number, number],
+        ];
+      } else {
+        throw new Error("too much columns to compute");
+      }
     } catch (e) {
       const error = e instanceof Error ? e : new Error(e);
       this.state = ["errored", error];

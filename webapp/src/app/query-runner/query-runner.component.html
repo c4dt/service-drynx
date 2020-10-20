@@ -15,7 +15,7 @@
               multiple
             >
               <mat-option *ngFor="let col of columns" [value]="col">
-                {{ col[1] }}
+                {{ col.name }}
               </mat-option>
             </mat-select>
           </mat-form-field></mat-list-item
@@ -26,7 +26,7 @@
             <mat-label>operation</mat-label>
             <mat-select formControlName="operation">
               <mat-option *ngFor="let op of operations" [value]="op">
-                {{ op.kind }}
+                {{ op }}
               </mat-option>
             </mat-select>
           </mat-form-field></mat-list-item
@@ -59,7 +59,7 @@
 
     <ng-container *ngIf="state[0] === 'loaded: single result'">
       <div style="height: 100px"></div>
-      {{ state[1] }}
+      <ng-container style="height: 100%"> {{ state[1] }} </ng-container>
       <h2>
         <ng-container *ngIf="state[2][0] === 'number'">
           {{ state[2][1] | number }}
@@ -76,12 +76,18 @@
       </h2>
     </ng-container>
 
-    <ng-container *ngIf="state[0] === 'loaded: many results'">
-      <app-results-plotter
-        [factors]="state[1]"
-        [columns]="state[2]"
-        style="height: 100%"
-      ></app-results-plotter>
-    </ng-container>
+    <app-results-plotter-2d
+      *ngIf="state[0] === 'loaded: two results'"
+      [columns]="state[1]"
+      [factors]="state[2]"
+      style="height: 100%"
+    ></app-results-plotter-2d>
+
+    <app-results-plotter-3d
+      *ngIf="state[0] === 'loaded: three results'"
+      [columns]="state[1]"
+      [factors]="state[2]"
+      style="height: 100%"
+    ></app-results-plotter-3d>
   </mat-tab>
 </mat-tab-group>
