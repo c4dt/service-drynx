@@ -93,6 +93,9 @@ export class Client {
 
   private compute(name: string, results: number[]): List<number> | undefined {
     switch (name) {
+      case "sum":
+        if (results.length !== 1) throw new Error("wrong shape of results");
+        return List.of(results[0]);
       case "mean":
         if (results.length !== 2) {
           throw new Error("wrong shape of results");
