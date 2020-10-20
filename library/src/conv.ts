@@ -3,8 +3,6 @@ import { Message } from "protobufjs/light";
 import * as Cothority from "@dedis/cothority";
 import { registerMessage } from "@dedis/cothority/protobuf"; // dedis/cothority#2154
 
-export type ColumnID = string;
-
 class PublishSignatureBytes extends Message<PublishSignatureBytes> {
   static register(): void {
     registerMessage("PublishSignatureBytes", PublishSignatureBytes);
@@ -115,7 +113,7 @@ export class Query extends Message<Query> {
 
   public readonly cuttingfactor: number | undefined;
 
-  public readonly selector: ColumnID[] | undefined;
+  public readonly selector: string[] | undefined;
 }
 
 export class ServerIdentityList extends Message<ServerIdentityList> {
