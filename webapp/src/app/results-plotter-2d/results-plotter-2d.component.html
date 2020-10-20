@@ -1,0 +1,6 @@
+<ng-container *ngIf="plotlyGraph !== undefined">
+  <plotly-plot
+    [data]="plotlyGraph.data"
+    [layout]="plotlyGraph.layout"
+  ></plotly-plot>
+</ng-container>

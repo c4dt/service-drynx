@@ -1,3 +1,4 @@
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
@@ -10,13 +11,26 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 
+import * as PlotlyJS from "plotly.js";
+import { PlotlyModule } from "angular-plotly.js";
+
 import { AppComponent } from "./app.component";
 import { QueryRunnerComponent } from "./query-runner/query-runner.component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ResultsPlotter2DComponent } from "./results-plotter-2d/results-plotter-2d.component";
+import { ResultsPlotter3DComponent } from "./results-plotter-3d/results-plotter-3d.component";
+import { VisGraph3dComponent } from "./results-plotter-3d/vis-graph3d.component";
 import { LibModule } from "@c4dt/angular-components";
 
+PlotlyModule.plotlyjs = PlotlyJS;
+
 @NgModule({
-  declarations: [AppComponent, QueryRunnerComponent],
+  declarations: [
+    AppComponent,
+    QueryRunnerComponent,
+    ResultsPlotter2DComponent,
+    ResultsPlotter3DComponent,
+    VisGraph3dComponent,
+  ],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
@@ -31,10 +45,10 @@ import { LibModule } from "@c4dt/angular-components";
     MatSelectModule,
     MatTabsModule,
 
+    PlotlyModule,
     LibModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AppModule {}
