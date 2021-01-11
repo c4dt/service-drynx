@@ -1,0 +1,36 @@
+name: deploy to demo.c4dt.org/drynx
+
+env:
+  DEPLOY_SSH_USER: drynx
+  DEPLOY_SSH_HOST: demo.c4dt.org
+
+on:
+  workflow_run:
+    workflows: ["test library & webapp"]
+    branches: [main]
+    types: [completed]
+
+jobs:
+  www:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1.1.0
+        with:
+          ssh-host: ${{ env.DEPLOY_HOST }}
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+      - name: rsync repository
+        run: >
+          rsync --verbose --archive --delete --exclude-from=.gitignore --exclude=/.git
+          "$GITHUB_WORKSPACE/" "${{ env.DEPLOY_SSH_USER }}@${{ env.DEPLOY_SSH_HOST }}:www"
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: >
+          cd library &&
+          npm version prerelease --preid=p`date +%Y%m%d%H%M%S` &&
+          npm publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.DEPLOY_NPM_TOKEN }}

@@ -1,0 +1,27 @@
+name: test library & webapp
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: npx prettier --check .
+      - run: >
+          echo library webapp | xargs -n1 sh -c
+          'cd $0 && npm ci && npx eslint --ext ts --max-warnings 0 .'
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - run: sudo apt install jq
+      - name: ensure correct drynx.proto generation
+        run: rm protobuf/drynx.proto
+      - run: make
+      - name: check repo is clean
+        run: >
+          out=`git status --porcelain`;
+          [ -z "$out" ] || ( git diff; exit 1 )
