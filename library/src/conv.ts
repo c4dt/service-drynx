@@ -43,9 +43,7 @@ class QueryDiffP extends Message<QueryDiffP> {
   public readonly limit: number | undefined;
 }
 
-class LogisticRegressionParameters extends Message<
-  LogisticRegressionParameters
-> {
+class LogisticRegressionParameters extends Message<LogisticRegressionParameters> {
   static register(): void {
     registerMessage(
       "LogisticRegressionParameters",
