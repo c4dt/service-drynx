@@ -4,7 +4,7 @@ import {
   ColumnTypes,
   DatedDaysColumn,
   DatedYearsColumn,
-  MultipliedColumn,
+  NumberColumn,
 } from "@c4dt/angular-components";
 
 export type Operation =
@@ -28,10 +28,10 @@ export function isOperation(obj: unknown): obj is Operation {
 export type OperationableColumnTypes =
   | DatedDaysColumn
   | DatedYearsColumn
-  | MultipliedColumn;
+  | NumberColumn;
 
 export type ScalableOperationAndColumn =
-  | ["sum" | "variance" | "standard deviation", MultipliedColumn]
+  | ["sum" | "variance" | "standard deviation", NumberColumn]
   | ["mean", OperationableColumnTypes];
 
 export function isScalableOperationAndColumn(
@@ -41,7 +41,7 @@ export function isScalableOperationAndColumn(
     case "sum":
     case "variance":
     case "standard deviation":
-      if (obj[1] instanceof MultipliedColumn) return true;
+      if (obj[1] instanceof NumberColumn) return true;
       break;
     case "mean":
       return true;
@@ -66,7 +66,7 @@ export function scaleResult(
         operationOnColumn[1] instanceof DatedYearsColumn
       )
         return operationOnColumn[1].offset(result);
-      else if (operationOnColumn[1] instanceof MultipliedColumn)
+      else if (operationOnColumn[1] instanceof NumberColumn)
         return operationOnColumn[1].multiply(result);
       throw new Error("unexpected column type");
     case "variance":
@@ -84,7 +84,7 @@ export function getValidOperations(
   switch (columns.size) {
     case 1: {
       const column = columns.get(0) as ColumnTypes;
-      if (column instanceof MultipliedColumn)
+      if (column instanceof NumberColumn)
         return List.of("sum", "mean", "variance", "standard deviation");
       else if (
         column instanceof DatedDaysColumn ||
@@ -98,7 +98,7 @@ export function getValidOperations(
       if (
         columns.every(
           (column) =>
-            column instanceof MultipliedColumn ||
+            column instanceof NumberColumn ||
             column instanceof DatedDaysColumn ||
             column instanceof DatedYearsColumn
         )

@@ -3,6 +3,7 @@ import { List } from "immutable";
 import { Component } from "@angular/core";
 
 import {
+  BreadCrumb,
   ColumnTypes,
   Table,
   fetchDataset,
@@ -19,6 +20,11 @@ import { OperationableColumnTypes } from "./operations";
 export class AppComponent {
   public datasets: List<Promise<Table>>;
   public columns: Promise<List<ColumnTypes>>;
+
+  public readonly showcaseBreadCrumb: BreadCrumb = {
+    label: "Drynx",
+    link: new URL("https://factory.c4dt.org/incubator/drynx"),
+  };
 
   constructor(config: ConfigService) {
     this.datasets = List(

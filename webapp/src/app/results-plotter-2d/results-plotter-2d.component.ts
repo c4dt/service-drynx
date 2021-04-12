@@ -2,7 +2,7 @@ import { Seq } from "immutable";
 
 import { Component, Input, OnChanges } from "@angular/core";
 
-import { MultipliedColumn } from "@c4dt/angular-components";
+import { NumberColumn } from "@c4dt/angular-components";
 
 import { scaleResult } from "../operations";
 import {
@@ -59,8 +59,8 @@ export class ResultsPlotter2DComponent implements OnChanges {
         acc[1] < point[1] ? acc[1] : point[1],
       ],
       [
-        columns[0] instanceof MultipliedColumn ? 0 : Number.MAX_VALUE,
-        columns[1] instanceof MultipliedColumn ? 0 : Number.MAX_VALUE,
+        columns[0] instanceof NumberColumn ? 0 : Number.MAX_VALUE,
+        columns[1] instanceof NumberColumn ? 0 : Number.MAX_VALUE,
       ]
     );
 

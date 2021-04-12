@@ -3,13 +3,13 @@ import { Range } from "immutable";
 import {
   DatedDaysColumn,
   DatedYearsColumn,
-  MultipliedColumn,
+  NumberColumn,
 } from "@c4dt/angular-components";
 
 export type ColumnsForLinearRegression =
   | DatedDaysColumn
   | DatedYearsColumn
-  | MultipliedColumn;
+  | NumberColumn;
 
 export const interpolationRange = Range(0, 10);
 
