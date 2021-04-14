@@ -16,15 +16,6 @@ export class ConfigService {
   public readonly ClientURL = new URL(
     `${locationStripped.replace(/^http/, "ws")}/leader`
   );
-  public readonly TotalRowCount = 30;
-
-  public readonly ByzCoin = {
-    ID: Buffer.from(
-      "9cc36071ccb902a1de7e0d21a2c176d73894b1cf88ae4cc2ba4c95cd76f474f3",
-      "hex"
-    ),
-    URL: new URL("wss://conode.c4dt.org:7771"),
-  };
 
   public readonly DataProviders = List.of(
     {
