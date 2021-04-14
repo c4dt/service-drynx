@@ -4,13 +4,18 @@ import { Injectable } from "@angular/core";
 import * as cothority from "@dedis/cothority";
 import * as kyber from "@dedis/kyber";
 
-const datasetBaseURL = "https://demo.c4dt.org/drynx/datasets";
+let locationStripped = globalThis.location.href;
+if (locationStripped.endsWith("/"))
+  locationStripped = locationStripped.substr(0, locationStripped.length - 1);
+const datasetBaseURL = `${locationStripped}/datasets`;
 
 @Injectable({
   providedIn: "root",
 })
 export class ConfigService {
-  public readonly ClientURL = new URL("wss://demo.c4dt.org/drynx/leader");
+  public readonly ClientURL = new URL(
+    `${locationStripped.replace(/^http/, "ws")}/leader`
+  );
   public readonly TotalRowCount = 30;
 
   public readonly ByzCoin = {
