@@ -1,4 +1,4 @@
-import { Graph3d } from "vis-graph3d/peer";
+import { Graph3d } from "vis-graph3d";
 
 import { Component, ElementRef, OnChanges, Input } from "@angular/core";
 
