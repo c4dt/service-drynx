@@ -77,7 +77,7 @@ export class ResultsPlotter3DComponent implements OnChanges {
         .map(([x, y, z], id) => {
           return { id, x, y, z };
         })
-        .toJS(),
+        .toArray(),
       options: {
         width: `${width}px`,
         height: `${height}px`,
