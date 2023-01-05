@@ -65,7 +65,7 @@
           {{ state[2][1] | number }}
         </ng-container>
         <ng-container *ngIf="state[2][0] === 'date/years'">
-          {{ state[2][1] | date: "yyyy" }}
+          {{ state[2][1] | date : "yyyy" }}
         </ng-container>
         <ng-container *ngIf="state[2][0] === 'date/days'">
           {{ state[2][1] | date }}
