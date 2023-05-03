@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   data-provider:
+    platform: linux/amd64
     image: c4dt/drynx:latest
     network_mode: host
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/data-provider"]
@@ -8,6 +9,7 @@ services:
       - ./datasets:/datasets
       - ./configs:/configs
   computing-node:
+    platform: linux/amd64
     image: c4dt/drynx:latest
     network_mode: host
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/computing-node"]
