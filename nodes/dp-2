@@ -1,0 +1,17 @@
+Address = "tcp://data-provider-2:1236"
+URL = "data-provider-2:1237"
+WebSocketTLSCertificate = ""
+WebSocketTLSCertificateKey = ""
+
+[ComputingNode]
+
+[DataProvider]
+
+  [DataProvider.FileLoader]
+    Path = "./datasets/2"
+
+[Key]
+  Private = "512695773358b0aeb6288f262faa4451b1bd7b3ea07114abe0039d56ef6d3db5"
+  Public = "4e8070296168a55866a12d2cd7dac4eab8cdf633d6e4f410a79e1e1e44a166b20b63d38823d8be259a9a18f0c646e963340868af41eef9383a2824eb5da178c8"
+
+[VerifyingNode]

@@ -1,29 +1,64 @@
-version: "3.7"
+version: "3.5"
+
 services:
-  data-provider:
-    platform: linux/amd64
-    image: c4dt/drynx:latest
-    network_mode: host
-    entrypoint: ["/bin/sh", "-c", "/server run < /configs/data-provider"]
-    volumes:
-      - ./datasets:/datasets
-      - ./configs:/configs
   computing-node:
-    platform: linux/amd64
     image: c4dt/drynx:latest
-    network_mode: host
-    entrypoint: ["/bin/sh", "-c", "/server run < /configs/computing-node"]
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/leader"]
     volumes:
-      - ./configs:/configs
-  http-datasets:
-    image: nginx:latest
+      - ./nodes/datasets:/datasets
+      - ./nodes:/configs
     ports:
-      - 8080:80
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "cd /etc/nginx && sed -i 's,\\(default_type\\s\\+\\).*,\\1text/plain;,' nginx.conf && sed -i \"/location \\/ {/a add_header 'Access-Control-Allow-Origin' '*';\" conf.d/default.conf && exec nginx -g 'daemon off;'",
-      ]
+      - 4321:4321
+    networks:
+      - drynx
+  data-provider-1:
+    image: c4dt/drynx:latest
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-1"]
     volumes:
-      - ./datasets:/usr/share/nginx/html
+      - ./nodes/datasets:/datasets
+      - ./nodes:/configs
+    networks:
+      - drynx
+  data-provider-2:
+    image: c4dt/drynx:latest
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-2"]
+    volumes:
+      - ./nodes/datasets:/datasets
+      - ./nodes:/configs
+    networks:
+      - drynx
+  data-provider-3:
+    image: c4dt/drynx:latest
+    entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-3"]
+    volumes:
+      - ./nodes/datasets:/datasets
+      - ./nodes:/configs
+    networks:
+      - drynx
+
+  frontend:
+    image: alexsuch/angular-cli:12.2.18
+    command: sh -c "npm ci; ng serve --host 0.0.0.0 --disable-host-check"
+    networks:
+      - drynx
+    restart: unless-stopped
+    working_dir: /app/webapp
+    volumes:
+      - ./webapp:/app/webapp
+      - ./library:/app/library
+
+  # Reverse proxy the dataset files and the frontend
+  nginx:
+    image: nginx:1.23.4
+    volumes:
+    - ./default.conf:/etc/nginx/conf.d/default.conf
+    - ./nodes/datasets:/www/datasets
+    ports:
+    - "8080:80"
+    environment:
+    - NGINX_PORT=80
+    networks:
+        - drynx
+
+networks:
+  drynx:

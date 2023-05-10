@@ -1,0 +1,4 @@
+docker run --entrypoint="/bin/sh" c4dt/drynx -c '/server new data-provider-1:1234 data-provider-1:1235 | /server data-provider new file-loader ./datasets/1 | /server computing-node new | /server verifying-node new' > nodes/dp-1
+docker run --entrypoint="/bin/sh" c4dt/drynx -c '/server new data-provider-2:1236 data-provider-2:1237 | /server data-provider new file-loader ./datasets/2 | /server computing-node new | /server verifying-node new' > nodes/dp-2
+docker run --entrypoint="/bin/sh" c4dt/drynx -c '/server new data-provider-3:1238 data-provider-3:1239 | /server data-provider new file-loader ./datasets/3 | /server computing-node new | /server verifying-node new' > nodes/dp-3
+docker run --entrypoint="/bin/sh" c4dt/drynx -c '/server new computing-node:4320 computing-node:4321 | /server data-provider new random | /server computing-node new | /server verifying-node new' > nodes/leader

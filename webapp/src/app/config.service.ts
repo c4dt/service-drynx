@@ -26,7 +26,7 @@ export class ConfigService {
         public: Buffer.concat([
           kyber.pairing.point.BN256G1Point.MARSHAL_ID,
           Buffer.from(
-            "502a8582994626225d2e04031522b104003534507796bec0ce91846a7ab5505750f692f0bbc15bab0e4be77b7950feb06cc3ef9c0954b7a5cd18c5541d5f743d",
+            "084d56ecfe11f5879e78195d90579d7f80be518f14ab0c0c46d82fcb223652bf843699a62acc86ae1613cd4ea530486aeeef1016302f1116fb7a5d70615dba8b",
             "hex"
           ),
         ]),
@@ -40,7 +40,7 @@ export class ConfigService {
         public: Buffer.concat([
           kyber.pairing.point.BN256G1Point.MARSHAL_ID,
           Buffer.from(
-            "2e8bb550b30ca511162745bde6311eba7439c94a12f7406c369c704cdb326dbe28a04fd054a66a50d8189f93e8a55b5896371759b43c4cf02af109a6c8564b3a",
+            "4e8070296168a55866a12d2cd7dac4eab8cdf633d6e4f410a79e1e1e44a166b20b63d38823d8be259a9a18f0c646e963340868af41eef9383a2824eb5da178c8",
             "hex"
           ),
         ]),
@@ -54,7 +54,7 @@ export class ConfigService {
         public: Buffer.concat([
           kyber.pairing.point.BN256G1Point.MARSHAL_ID,
           Buffer.from(
-            "79cca3dac2ed903e324a72d036210a329dfcc4418721687eb0007f5a09777b991bae1916e8ba7602cf0cc09b0ac530371db584545ea09b23101b3d9f59b82e57",
+            "6ad6addf63dfe841d7042dfcd082602cd02ef10e50a314c33c1bc3eb501fba0d052aeb991111dae85a97aaa716a8d44a9a8a9d8b71e52c25491b2307abdef3d6",
             "hex"
           ),
         ]),
@@ -67,7 +67,7 @@ export class ConfigService {
     public: Buffer.concat([
       kyber.pairing.point.BN256G1Point.MARSHAL_ID,
       Buffer.from(
-        "08588c22f9758797d2bac23aed6182ad23a1ad5c8be0b1529e300ef07ee132ce55fe3cbdae8d62ecdd23b7ce10fda9e1c294b3094af16c3b874ab0f38245b2b7",
+        "77f4237da9b62f2096ebd178038bd754d924fe9434367827b718d700953b7be27ad7428ef9bd6248e4f258cbc3ca2955c10f028e0b92676ef1499f91e4ebd4ec",
         "hex"
       ),
     ]),
