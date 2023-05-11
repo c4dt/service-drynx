@@ -1,0 +1,16 @@
+Address = "tcp://computing-node:4320"
+URL = "computing-node:4321"
+WebSocketTLSCertificate = ""
+WebSocketTLSCertificateKey = ""
+
+[ComputingNode]
+
+[DataProvider]
+
+  [DataProvider.Random]
+
+[Key]
+  Private = "6e310b0feff253f3b01297169d9221493f08079d738558010b0e2c63f528d196"
+  Public = "77f4237da9b62f2096ebd178038bd754d924fe9434367827b718d700953b7be27ad7428ef9bd6248e4f258cbc3ca2955c10f028e0b92676ef1499f91e4ebd4ec"
+
+[VerifyingNode]

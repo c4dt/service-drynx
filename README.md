@@ -21,6 +21,14 @@ docker-compose up
 The docker images are available for `linux/amd64` only, but using `Rosetta` makes them also work on mac with M1/M2
 processors.
 
+**WARNING**: The nodes in this setup are using hardcoded public/private keypairs from the `nodes` folder, do not deploy this setup in production! You can generate new config files with:
+
+```
+sh generate-config.sh
+```
+
+But then you also need to update the public keys in `webapp/src/app/config.service.ts`.
+
 ## Details about the article
 
 Data sharing has become of primary importance in many domains such as big-data analytics, economics and medical 
