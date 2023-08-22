@@ -1,4 +1,8 @@
-# Drynx demonstrator
+# Archived repo
+
+This repo has been archived and is only available to run the demo.
+
+## Drynx demonstrator
 
 Drynx is a decentralized system that can perform statistical analysis and machine learning on 
 sensitive and distributed data while ensuring data confidentiality and privacy. It uses interactive protocols, 
