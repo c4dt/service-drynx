@@ -1,4 +1,4 @@
-# Archived repo
+# Drynx-service has been archived
 
 This repo has been archived and is only available to run the demo.
 
