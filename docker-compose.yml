@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   computing-node:
-    image: c4dt/drynx:latest
+    image: ghcr.io/c4dt/drynx:latest
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/leader"]
     volumes:
       - ./nodes/datasets:/datasets
@@ -12,7 +12,7 @@ services:
     networks:
       - drynx
   data-provider-1:
-    image: c4dt/drynx:latest
+    image: ghcr.io/c4dt/drynx:latest
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-1"]
     volumes:
       - ./nodes/datasets:/datasets
@@ -20,7 +20,7 @@ services:
     networks:
       - drynx
   data-provider-2:
-    image: c4dt/drynx:latest
+    image: ghcr.io/c4dt/drynx:latest
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-2"]
     volumes:
       - ./nodes/datasets:/datasets
@@ -28,7 +28,7 @@ services:
     networks:
       - drynx
   data-provider-3:
-    image: c4dt/drynx:latest
+    image: ghcr.io/c4dt/drynx:latest
     entrypoint: ["/bin/sh", "-c", "/server run < /configs/dp-3"]
     volumes:
       - ./nodes/datasets:/datasets
@@ -37,8 +37,8 @@ services:
       - drynx
 
   frontend:
-    image: alexsuch/angular-cli:12.2.18
-    command: sh -c "npm ci; ng serve --host 0.0.0.0 --disable-host-check"
+    image: ghcr.io/c4dt/service-drynx
+    build: .
     networks:
       - drynx
     restart: unless-stopped
@@ -52,7 +52,7 @@ services:
     image: nginx:1.23.4
     volumes:
     - ./default.conf:/etc/nginx/conf.d/default.conf
-    - ./nodes/datasets:/www/datasets
+    - ./nodes/datasets:/www/datasets-drynx
     ports:
     - "8080:80"
     environment:

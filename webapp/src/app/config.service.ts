@@ -7,7 +7,7 @@ import * as kyber from "@dedis/kyber";
 let locationStripped = globalThis.location.href;
 if (locationStripped.endsWith("/"))
   locationStripped = locationStripped.substr(0, locationStripped.length - 1);
-const datasetBaseURL = `${locationStripped}/datasets`;
+const datasetBaseURL = `${locationStripped}/datasets-drynx`;
 
 @Injectable({
   providedIn: "root",

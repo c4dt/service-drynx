@@ -57,3 +57,6 @@ $Dwebapp/dist/stackblitz:
 ifneq ($S,)
 all: $Sall
 endif
+
+clean:
+	rm -rf cothority drynx services webapp/node_modules library/node_modules
